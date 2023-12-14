@@ -1,0 +1,6 @@
+﻿cmd,opt,se_type
+regress,robust,hc1
+areg,robust,hc1
+xtreg,robust,cluster
+reghdfe,robust,hc1
+ivreg2,robust,hc1

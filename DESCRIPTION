@@ -1,0 +1,13 @@
+Package: repboxReg
+Type: Package
+Title: Repbox module for analysing regressions
+Version: 0.1.0
+Author: Sebastian Kranz (Ulm University)
+Maintainer: Sebastian Kranz <sebastian.kranz@uni-ulm.de>
+Description: Repbox module for analysing regressions
+License: Not yet licensed. Not yet in public domain
+Depends: dplyr, data.table, restorepoint, dbmisc, stringtools,
+         tidyr, fixest, collapse,
+         igraph, repboxDB
+Encoding: UTF-8
+LazyData: true

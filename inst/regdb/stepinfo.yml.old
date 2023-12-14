@@ -1,0 +1,22 @@
+# Fields with one entry per regression
+
+name: stepinfo
+
+descr: |
+  General information for each step that does not depend on the variant
+
+unique_index:
+  main_index: [artid, step]
+
+fields:
+  artid:
+    descr: ID of the article whose supplement is analyzed. Typically the EJD project name like aer_110_3_2
+    synonym: project
+
+  step:
+    descr: |
+    type: int
+
+  base_variant:
+    descr: The base variant of this regression
+    values: [sb,rb]

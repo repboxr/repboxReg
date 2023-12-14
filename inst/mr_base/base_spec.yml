@@ -1,0 +1,59 @@
+metaid: base
+
+descr: |
+  Base run that generates core information in regdb database
+  and performs checks by comparing results from original run,
+  base run and translation to R.
+
+# Parcels that contain data stored in regdb tables
+regdb_parcels:
+  base_core:
+    descr: |
+      Core information for base run.
+      This parcel will be loaded by most metareg studies
+      in order to compare with baseline results and to get
+      basic regression information.
+    variants: [sb,rb]
+    tables: [header, reg, regcheck, regcoef_diff]
+
+  base_cmdpart:
+    tables: [cmdpart]
+
+  base_regsource:
+    tables: [regsource]
+
+  base_regcoef:
+    descr: |
+      Base run. This parcel will be loaded by most metareg studies
+      in order to compare with baseline results and get
+      basic regression information.
+    variants: [sb,rb]
+    tables: [regcoef]
+
+  base_regvar:
+    variants: [sb,rb]
+    tables: [regvar]
+
+  base_regxvar:
+    variants: [sb,rb]
+    tables: [regxvar]
+
+
+  base_colstat:
+    tables: [colstat_dummy, colstat_factor, colstat_numeric]
+
+  base_regscalar:
+    variants: [sb,rb]
+    tables: [regscalar]
+
+  base_regstring:
+    variants: [sb,rb]
+    tables: [regstring]
+
+  org_regcoef:
+    descr: |
+      Regression coefficients of original run. Ideally,
+      are the same than in the base run.
+    variants: [so, ro]
+    tables: [regcoef]
+
