@@ -5,19 +5,19 @@
 
 example = function() {
   library(repboxReg)
-  project.dir = "/home/rstudio/repbox/projects_reg/aer_105_5_55"
+  project_dir = "/home/rstudio/repbox/projects_reg/aer_105_5_55"
   step = 5
 
   dat=haven::read_dta("/home/rstudio/repbox/projects_reg/aer_105_5_55/metareg/dap/stata/cache/step_1.dta")
 
-  dap = get.project.dap(project.dir)
+  dap = get.project.dap(project_dir)
   mr = dap
   internal_reg = mr_get_reg_info(mr, step,dat)
   org_dat = dat
-  dat = mr_adapt_data_for_reg(project.dir, step, internal_reg, dat)
+  dat = mr_adapt_data_for_reg(project_dir, step, internal_reg, dat)
 
-  regvar = load_parcel(project.dir, "base","base_regvar")$regvar %>% filter(step==5)
-  regcoef = load_parcel(project.dir, "base","base_regcoef")$regcoef %>% filter(step==5)
+  regvar = load_parcel(project_dir, "base","base_regvar")$regvar %>% filter(step==5)
+  regcoef = load_parcel(project_dir, "base","base_regcoef")$regcoef %>% filter(step==5)
 
   regxvar = make_regxvar(regvar, dat, regcoef)
   regxvar

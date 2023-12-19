@@ -1,9 +1,9 @@
 
 example = function() {
   project = "testsupp"
-  project.dir = file.path("~/repbox/projects_reg",project)
+  project_dir = file.path("~/repbox/projects_reg",project)
 
-  rr = readRDS(file.path(project.dir,"repbox/stata/repbox_results.Rds"))
+  rr = readRDS(file.path(project_dir,"repbox/stata/repbox_results.Rds"))
   run.df = rr$run.df
   #set.seed(1234)
   dap = make.dap(run.df)

@@ -4,9 +4,9 @@ example.metareg.stata = function() {
   project = "aejapp_13_3_7"
 
   project = "testsupp"
-  project.dir = file.path("~/repbox/projects_reg",project)
+  project_dir = file.path("~/repbox/projects_reg",project)
 
-  dap = get.project.dap(project.dir,add.run.df = TRUE)
+  dap = get.project.dap(project_dir,add.run.df = TRUE)
   plot.dap(dap)
   step.df = dap$step.df
 
@@ -28,7 +28,7 @@ example.metareg.stata = function() {
     stata.res
   }
 
-  mr = mr_init_study(project.dir,metaid="base", stata_code_fun=stata_code_fun,study_agg_fun = agg.fun, dap=dap)
+  mr = mr_init_study(project_dir,metaid="base", stata_code_fun=stata_code_fun,study_agg_fun = agg.fun, dap=dap)
   set.seed(123)
   mr = mr_make_all_stata_code(mr, stata_code_fun, asteps = sample(mr_get_asteps(mr),1))
   mr = mr_run_all_stata_code(mr)
@@ -93,7 +93,7 @@ mr_make_all_stata_code = function(mr, stata_code_fun=mr$stata_code_fun, asteps =
   # Load data code
   source_steps = unique(path.df$source_step)
   load_code = sapply(source_steps, function(step) {
-    file = mr_get_cache_file(mr$project.dir, step)
+    file = mr_get_cache_file(mr$project_dir, step)
     paste0('use "', file,'", clear',"\n")
   })
   step.df$load_code[source_steps] = load_code
@@ -131,8 +131,8 @@ mr_make_all_stata_code = function(mr, stata_code_fun=mr$stata_code_fun, asteps =
     file.remove(path.code.files)
   }
   # Add adopath code
-  #ado.code = adopath.injection.code(mr$project.dir, ado.dirs = get.ado.dirs())
-  ado.code = adopath.injection.code(mr$project.dir)
+  #ado.code = adopath.injection.code(mr$project_dir, ado.dirs = get.ado.dirs())
+  ado.code = adopath.injection.code(mr$project_dir)
   while(NROW(path.df) > 0) {
     # Pick (a) longest path from path.df
     .astep = first(path.df$astep[path.df$path.len == max(path.df$path.len)])
@@ -181,14 +181,14 @@ mr_make_all_stata_code = function(mr, stata_code_fun=mr$stata_code_fun, asteps =
   return(mr)
 }
 
-mr_write_path_stata_code = function(mr, astep=first(mr$path.df$astep), code.file=paste0(mr$project.dir,"/metareg/step_",astep,".do"), add.line.info = !is.null(run.df), run.df=mr$run.df,...) {
+mr_write_path_stata_code = function(mr, astep=first(mr$path.df$astep), code.file=paste0(mr$project_dir,"/metareg/step_",astep,".do"), add.line.info = !is.null(run.df), run.df=mr$run.df,...) {
   restore.point("mr_write_path_stata_code")
 
   txt = "\n\nset more off\n"
   path = dap$path.df[dap$path.df$astep == astep,]
   # 1. Get data file
   step = path$step[1]
-  file = mr_get_cache_file(mr$project.dir, step)
+  file = mr_get_cache_file(mr$project_dir, step)
   txt = paste0(txt,'\nuse "', file,'", clear\n')
 
   # 2. code for all other steps data modification steps

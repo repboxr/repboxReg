@@ -1,14 +1,14 @@
 example = function() {
   project = "testsupp"
-  project.dir = file.path("~/repbox/projects_reg",project)
-  mr_base_aggregate_again(project.dir)
+  project_dir = file.path("~/repbox/projects_reg",project)
+  mr_base_aggregate_again(project_dir)
 
   res = mr_for_all_projects("~/repbox/projects_reg",mr_base_aggregate_again, stop.on.error = FALSE)
 
   #res = mr_for_all_projects("~/repbox/projects_reg",mr_base_aggregate_again, stop.on.error = TRUE, just.num = 2)
 
-  has_err = mr_for_all_projects("~/repbox/projects_reg",function(project.dir) {
-    tibble(project = basename(project.dir), agg_error = file.exists(file.path(project.dir, "metareg/base/has_error_aggregate_again.txt")))
+  has_err = mr_for_all_projects("~/repbox/projects_reg",function(project_dir) {
+    tibble(project = basename(project_dir), agg_error = file.exists(file.path(project_dir, "metareg/base/has_error_aggregate_again.txt")))
   }) %>% bind_rows()
 
 

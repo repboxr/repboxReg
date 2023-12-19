@@ -1,14 +1,14 @@
 example = function() {
   project = "aejapp_13_3_7"
-  project.dir = file.path("~/repbox/projects_reg",project)
-  rema = reg.match(project.dir)
+  project_dir = file.path("~/repbox/projects_reg",project)
+  rema = reg.match(project_dir)
   reg.df = rema$mreg.df
   reg = reg.df[20,]
-  data = load.reg.dta(project.dir, reg)
+  data = load.reg.dta(project_dir, reg)
 
   did.li = lapply(seq_len(NROW(reg.df)), function(i) {
     reg = reg.df[i,]
-    data = load.reg.dta(project.dir, reg)
+    data = load.reg.dta(project_dir, reg)
     did.df = stata.reg.did.info(data, reg)
   })
 
@@ -25,18 +25,18 @@ example = function() {
   is.did.staggered(delta.mat)
 
   regs = df.rows.to.list(reg.df)
-  did.df = lapply(regs, stata.reg.find.did.triplets, project.dir=project.dir) %>% bind_rows()
+  did.df = lapply(regs, stata.reg.find.did.triplets, project_dir=project_dir) %>% bind_rows()
 
   reg$ct
 
 
-  rstudioapi::filesPaneNavigate(paste0(project.dir,"/repbox"))
+  rstudioapi::filesPaneNavigate(paste0(project_dir,"/repbox"))
   rstudioapi::filesPaneNavigate("~/repbox/repboxReg/R")
 }
 
 
 stata.reg.did.info = function(data, reg) {
-  data = load.reg.dta(project.dir, reg)
+  data = load.reg.dta(project_dir, reg)
   trip.df = stata.reg.find.did.triplets(reg, data)
   if (NROW(trip.df)==0) return(NULL)
   trip.df = add.fe.to.to.dummy.tripplets(data,trip.df)
@@ -65,7 +65,7 @@ stata.reg.did.info = function(data, reg) {
 
 }
 
-stata.reg.find.did.triplets = function(reg, df=load.reg.dta(project.dir, reg), project.dir) {
+stata.reg.find.did.triplets = function(reg, df=load.reg.dta(project_dir, reg), project_dir) {
   restore.point("reg.find.triplets")
   delta.cand = get.delta.cand(df)
   ct = reg$ct[[1]]

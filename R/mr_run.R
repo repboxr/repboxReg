@@ -1,8 +1,8 @@
 example = function() {
   project = "testsupp"
-  project.dir = file.path("~/repbox/projects_reg",project)
+  project_dir = file.path("~/repbox/projects_reg",project)
 
-  dap = get.project.dap(project.dir,add.run.df = TRUE)
+  dap = get.project.dap(project_dir,add.run.df = TRUE)
 
   plot.dap(dap)
   step.df = dap$step.df
@@ -134,7 +134,7 @@ mr_store_runtime = function(mr, save = TRUE) {
   restore.point("mr_store_runtime")
 
   rt = list(
-    total = data.frame(project=basename(mr$project.dir), metaid=mr$metaid, r_runtime = mr$r_runtime, stata_runtime=mr$stata_runtime, agg_runtime=mr$agg_runtime),
+    total = data.frame(project=basename(mr$project_dir), metaid=mr$metaid, r_runtime = mr$r_runtime, stata_runtime=mr$stata_runtime, agg_runtime=mr$agg_runtime),
     steps_runtime = transmute(mr$step.df, step=step, action=ifelse(cache,"load",step_type), r_runtime=runtime) %>% filter(!is.na(r_runtime))
   )
   if (save) {
@@ -310,7 +310,7 @@ mr_mod_step = function(mr, step, dat, env = new.env(parent = METAREG_STATA_ENV))
   if (opts$load.extra.cache) {
     cache.dat = mr_load_extra_cache(mr, step)
     if (!is.null(cache.dat)) {
-      msg = paste0("\nWe used the extra cache for step ", step, " (see ", mr$project.dir,"/metareg/extra_cache/). The cache was created in an earlier run of this step that yielded an error.\n")
+      msg = paste0("\nWe used the extra cache for step ", step, " (see ", mr$project_dir,"/metareg/extra_cache/). The cache was created in an earlier run of this step that yielded an error.\n")
       mr_cat(msg)
       return(cache.dat)
     }
@@ -327,7 +327,7 @@ mr_mod_step = function(mr, step, dat, env = new.env(parent = METAREG_STATA_ENV))
     msg = paste0("Error in running R data modification step ", step,". Possible reasons: translation code has a bug / is not complete or the Stata code uses variable abbreviations, which we don't translate to R.")
 
     if (opts$extra.infeasible) {
-      inf.dir = file.path(mr$project.dir,"/metareg/extra_infeasible")
+      inf.dir = file.path(mr$project_dir,"/metareg/extra_infeasible")
       if (!dir.exists(inf.dir)) dir.create(inf.dir)
       inf.file = paste0(inf.dir,"/",step,".inf")
       writeLines("",inf.file)
@@ -341,7 +341,7 @@ mr_mod_step = function(mr, step, dat, env = new.env(parent = METAREG_STATA_ENV))
         mr_cat(msg)
         return(dat)
       }
-      msg = paste0(msg,"\nWe tried to create an extra cache file by running the Stata code (see", paste0(mr$project.dir,"/metareg/extra_cache/step_", step,".do"),"), but it failed. An error in the Stata code might be due to an error in the supplement or by missing some Stata command when creating the modification steps of the data analysis plan (DAP). This means the metareg package must be corrected.\n")
+      msg = paste0(msg,"\nWe tried to create an extra cache file by running the Stata code (see", paste0(mr$project_dir,"/metareg/extra_cache/step_", step,".do"),"), but it failed. An error in the Stata code might be due to an error in the supplement or by missing some Stata command when creating the modification steps of the data analysis plan (DAP). This means the metareg package must be corrected.\n")
       if (opts$extra.infeasible) {
         msg = paste0(msg, "\nWe marked the step as infeasible (see ", inf.dir,") If you re-run the metareg study again, it will cache this step based on the Stata output.")
       }
@@ -370,7 +370,7 @@ mr_analysis_step = function(mr, astep, dat) {
 
   infeasible_filter=FALSE
   org_dat = dat
-  dat = mr_adapt_data_for_reg(mr$project.dir, astep, reg, dat)
+  dat = mr_adapt_data_for_reg(mr$project_dir, astep, reg, dat)
 
 
   if (mr_is_infeasible(dat)) {
@@ -381,7 +381,7 @@ mr_analysis_step = function(mr, astep, dat) {
 
     #return(res)
     infeasible_filter=TRUE
-    dat = mr_adapt_data_for_reg(mr$project.dir, astep, reg, org_dat,use.filter=FALSE)
+    dat = mr_adapt_data_for_reg(mr$project_dir, astep, reg, org_dat,use.filter=FALSE)
   }
 
   if (mr$opts$pass.regdb.info) {
@@ -412,11 +412,11 @@ mr_analysis_step = function(mr, astep, dat) {
 }
 
 
-mr_adapt_data_for_reg = function(project.dir,step, reg, dat, logical.to.dummy = TRUE, use.filter = TRUE) {
+mr_adapt_data_for_reg = function(project_dir,step, reg, dat, logical.to.dummy = TRUE, use.filter = TRUE) {
   restore.point("mr_adapt_data_for_reg")
   # Filter
   if (!is.na(reg$if_str) & use.filter) {
-    res = try(eval_reg_if_condition(project.dir,step, reg, dat), silent=TRUE)
+    res = try(eval_reg_if_condition(project_dir,step, reg, dat), silent=TRUE)
     if (is(res, "try-error")) {
       restore.point("sfhshfjkdhjkfhdshfhsd")
       return(mr_infeasible(paste0("\nCannot evaluate in R the if condition ", reg$if_str, "\nin\n", reg$cmdline,". Also no ifrows were stored","\nOriginal error:\n", as.character(res)), if_str=reg$if_str))
@@ -551,7 +551,7 @@ mr_get_rcode = function(mr, step) {
 
 
 mr_load_data = function(mr, step) {
-  file = mr_get_cache_file(mr$project.dir, step)
+  file = mr_get_cache_file(mr$project_dir, step)
   dat = haven::read_dta(file)
   dat
 }
@@ -572,14 +572,14 @@ mr_write_path_code = function(mr, astep=first(mr$path.df$astep), ...) {
   mr_write_path_stata_code(mr, astep, ...)
 }
 
-mr_write_path_r_code = function(mr, astep=first(mr$path.df$astep), code.file=paste0(mr$project.dir,"/metareg/step_",astep,".r"), stata.as.comment = FALSE, add.line.info = !is.null(run.df), run.df=mr$run.df,...) {
+mr_write_path_r_code = function(mr, astep=first(mr$path.df$astep), code.file=paste0(mr$project_dir,"/metareg/step_",astep,".r"), stata.as.comment = FALSE, add.line.info = !is.null(run.df), run.df=mr$run.df,...) {
   restore.point("mr_write_path_r_code")
 
   txt = ""
   path = dap$path.df[dap$path.df$astep == astep,]
   # 1. Get data file
   step = path$step[1]
-  file = mr_get_cache_file(mr$project.dir, step)
+  file = mr_get_cache_file(mr$project_dir, step)
   txt = paste0(txt,'
 # We will evaluate the following stata code using the special stata environment
 stata.env = make.stata.funs.env()
@@ -705,9 +705,9 @@ check_mr_class = function(mr) {
   }
 }
 
-mr_load_reg_ifrows = function(project.dir, step) {
+mr_load_reg_ifrows = function(project_dir, step) {
   restore.point("load_ifrows")
-  dir = file.path(project.dir,"metareg","dap","stata", "ifrows")
+  dir = file.path(project_dir,"metareg","dap","stata", "ifrows")
   file = paste0(dir,"/ifrows_", step, ".dta")
   if (!file.exists(file)) return(list(ok=FALSE))
   row_dat = haven::read_dta(file)
@@ -715,7 +715,7 @@ mr_load_reg_ifrows = function(project.dir, step) {
 }
 
 
-eval_reg_if_condition = function(project.dir, step, reg, dat) {
+eval_reg_if_condition = function(project_dir, step, reg, dat) {
   restore.point("eval_reg_if_condition")
   if_str = gsub("<-","< -", reg$if_str, fixed=TRUE)
   # In Stata ~= is a synonym for !=
@@ -730,7 +730,7 @@ eval_reg_if_condition = function(project.dir, step, reg, dat) {
   # If condition can be evaluated
   if (!is(try_dat,"try-error")) return(try_dat)
 
-  res = mr_load_reg_ifrows(project.dir, step)
+  res = mr_load_reg_ifrows(project_dir, step)
   # ifrows were stored
   if (res$ok) {
     dat = dat[res$ifrows,]

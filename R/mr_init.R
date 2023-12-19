@@ -2,9 +2,9 @@ example = function() {
   project = "testsupp"
   #project = "aejapp_13_3_7"
 
-  project.dir = file.path("~/repbox/projects_reg",project)
+  project_dir = file.path("~/repbox/projects_reg",project)
 
-  dap = get.project.dap(project.dir,add.run.df = TRUE)
+  dap = get.project.dap(project_dir,add.run.df = TRUE)
   #plot.dap(dap)
   step.df = dap$step.df
 
@@ -36,7 +36,7 @@ example = function() {
     fml = vi_to_fixest_formula(vi, min_fe_level = 9)
     fix = feols(fml,dat)
   }
-  mr = mr_init_study(project.dir,metaid="HC", fun=ana.fun, dap=dap)
+  mr = mr_init_study(project_dir,metaid="HC", fun=ana.fun, dap=dap)
 
   mr_write_path_rcode(mr, code.file = file.path(mr$out.dir,"path_code.R"),add.line.info = TRUE)
   mr_run(mr, asteps = sample(mr_get_asteps(mr),2))
@@ -55,7 +55,7 @@ mr_init_metastudy = function(project.dirs, ...) {
 }
 
 # A study refers to a single supplement / article
-mr_init_study = function(project.dir,  metaid=NULL,artid = basename(project.dir), version=NULL, dap = get.project.dap(project.dir,make.if.missing = TRUE), opts=mr_opts(), step_run_fun = NULL, study_agg_fun = NULL,stata_code_fun = NULL, stata_agg_fun = NULL, main_metaid = metaid, stata_version=NA) {
+mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir), version=NULL, dap = get.project.dap(project_dir,make.if.missing = TRUE), opts=mr_opts(), step_run_fun = NULL, study_agg_fun = NULL,stata_code_fun = NULL, stata_agg_fun = NULL, main_metaid = metaid, stata_version=NA) {
   restore.point("mr_init_study")
   if (!is_valid_metaid(metaid)) {
     stop("Please provide a valid analyis id (metaid). It shall contain only letters, digits and _ and not start with _.")
@@ -71,7 +71,7 @@ mr_init_study = function(project.dir,  metaid=NULL,artid = basename(project.dir)
 
   mr$metaid = metaid
   mr$artid = artid
-  mr$project.dir = standardizePath(project.dir)
+  mr$project_dir = standardizePath(project_dir)
   mr$version = version
   mr$stata_version = stata_version
   mr$total_runtime = NA
@@ -85,22 +85,22 @@ mr_init_study = function(project.dir,  metaid=NULL,artid = basename(project.dir)
   mr$run.df = dap$run.df
 
   mr$opts = opts
-  if (dir.exists(file.path(mr$project.dir,"repbox/stata"))) {
+  if (dir.exists(file.path(mr$project_dir,"repbox/stata"))) {
     mr$project.type = "repbox"
-    try(mr$dotab <- readRDS(file.path(mr$project.dir,"repbox/stata/dotab.Rds")))
+    try(mr$dotab <- readRDS(file.path(mr$project_dir,"repbox/stata/dotab.Rds")))
   } else {
     mr$project.type = "metareg"
   }
-  mr$out.dir = file.path(mr$project.dir, "metareg", metaid)
+  mr$out.dir = file.path(mr$project_dir, "metareg", metaid)
   if (!dir.exists(mr$out.dir)) {
     dir.create(mr$out.dir,recursive = TRUE)
   }
-  mr$step.dir = file.path(mr$project.dir, "metareg", metaid, "step_results")
+  mr$step.dir = file.path(mr$project_dir, "metareg", metaid, "step_results")
   if (!dir.exists(mr$step.dir)) {
     dir.create(mr$step.dir,recursive = TRUE)
   }
 
-  mr$regdb.out.dir = file.path(mr$project.dir, "metareg", metaid, "regdb")
+  mr$regdb.out.dir = file.path(mr$project_dir, "metareg", metaid, "regdb")
   if (!dir.exists(mr$regdb.out.dir)) {
     dir.create(mr$regdb.out.dir,recursive = TRUE)
   }
@@ -111,10 +111,10 @@ mr_init_study = function(project.dir,  metaid=NULL,artid = basename(project.dir)
   mr$study_agg_fun = study_agg_fun
 
   clear_problem_files
-  check = dap_check_all_cache_files_exist(project.dir, mr$step.df)
+  check = dap_check_all_cache_files_exist(project_dir, mr$step.df)
   if (!check$ok) {
     mr = mr_set_problem(mr, "missing_cache", paste0(
-"Cannot perform the metastudy for ", mr$project.dir, " since not all data cache files exist. The owner of the project has to repeat the base analysis again in order to repair the project. Reasons for the corruption could be i) A new DAP was generated but the cache refers to an older DAP or ii) When generating the DAP the Stata code did not work as expected, e.g. because it was run on a slimified folder where data sets where removed."))
+"Cannot perform the metastudy for ", mr$project_dir, " since not all data cache files exist. The owner of the project has to repeat the base analysis again in order to repair the project. Reasons for the corruption could be i) A new DAP was generated but the cache refers to an older DAP or ii) When generating the DAP the Stata code did not work as expected, e.g. because it was run on a slimified folder where data sets where removed."))
     return(mr)
   }
 
@@ -130,7 +130,7 @@ mr_init_study = function(project.dir,  metaid=NULL,artid = basename(project.dir)
 
 #' Options
 #' @param save.each.step If TRUE saves the results of each analysis step in a default .Rds file. Set to FALSE if your analysis steps saves the results itself.
-#' @param extra.cache If the R code for a mod step has an error run the stata code instead and store the resulting .dta file for this step in project.dir/metareg/extra_cache. This file will then be used for the following analysis steps. We call it extra cache since we did not yet detect at the parsing stage that a cache will be required here.
+#' @param extra.cache If the R code for a mod step has an error run the stata code instead and store the resulting .dta file for this step in project_dir/metareg/extra_cache. This file will then be used for the following analysis steps. We call it extra cache since we did not yet detect at the parsing stage that a cache will be required here.
 #' @param load.extra.cache Should a previously generated extra.cache file for a step directly be loaded?
 #' @param extra.infeasible An alternative to extra.cache. If the R code in a modification step throws an error just generate a flag by storing a file in metareg/extra_infeasible. No cache will be generated. Yet, when running the whole project again, DAP will mark any extra infeasible step as infeasible and thus generate cache files. This approach will sometimes generate more efficient caches than extra.cache = TRUE, but takes longer since the complete repbox project must be run again. Best set either extra.cache=TRUE or extra.infeasible=TRUE.
 

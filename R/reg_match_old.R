@@ -2,8 +2,8 @@ example = function() {
   parent.dir = "~/statabox/supp"
   repbox_match_all(parent.dir)
 
-  project.dir = "/home/rstudio/statabox/supp/aejapp_vol_6_issue_3_article_7"
-  res = repbox_match(project.dir,force = TRUE)
+  project_dir = "/home/rstudio/statabox/supp/aejapp_vol_6_issue_3_article_7"
+  res = repbox_match(project_dir,force = TRUE)
   sapply(names(res), function(na) {
     paste0(na, " ", format(object.size(res[[na]]), units="MB"))
   })
@@ -17,22 +17,22 @@ example = function() {
 }
 
 
-old.reg.match = function(project.dir, verbose=TRUE) {
+old.reg.match = function(project_dir, verbose=TRUE) {
   restore.point("repbox.reg.match")
-  repbox.dir = paste0(project.dir,"/repbox")
+  repbox.dir = paste0(project_dir,"/repbox")
 
   pdf.tabs = readRDS(paste0(repbox.dir, "/arttab.Rds"))
   pdf.tabs = add.reg.df.to.tabs.df(pdf.tabs)
   pdf.tabs = filter(pdf.tabs, has.reg.df)
   if (NROW(pdf.tabs)==0) {
-    cat(paste0("\n\tNo regression tables found in PDF of project ", project.dir))
+    cat(paste0("\n\tNo regression tables found in PDF of project ", project_dir))
     return(NULL)
   }
 
   regtab = readRDS(paste0(repbox.dir, "/stata/regtab.Rds"))
   if (NROW(regtab)==0) {
     if (verbose) {
-      cat(paste0("\n\tNo regressions were run for project ", project.dir))
+      cat(paste0("\n\tNo regressions were run for project ", project_dir))
       return(NULL)
     }
   }
@@ -43,7 +43,7 @@ old.reg.match = function(project.dir, verbose=TRUE) {
     mutate(creg.row = seq_len(n()))
   if (NROW(creg.df)==0) {
     if (verbose) {
-      cat(paste0("\n\tNo regression results obtained when running supplement for project ", project.dir))
+      cat(paste0("\n\tNo regression results obtained when running supplement for project ", project_dir))
       return(invisible())
     }
   }

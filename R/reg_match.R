@@ -1,27 +1,27 @@
 example = function() {
-  project.dir = standardizePath("~/repbox/projects_reg/aejapp_13_3_7")
-  res = reg.match(project.dir)
+  project_dir = standardizePath("~/repbox/projects_reg/aejapp_13_3_7")
+  res = reg.match(project_dir)
 
   mreg.df = res$mreg.df
 
-  aregs = make.artreg.rds(project.dir)
-  aregs = load.or.make.artreg(project.dir)
+  aregs = make.artreg.rds(project_dir)
+  aregs = load.or.make.artreg(project_dir)
 
 
 
 }
 
-load.or.create.reg.match = function(project.dir) {
-  rema = load.reg.match(project.dir)
+load.or.create.reg.match = function(project_dir) {
+  rema = load.reg.match(project_dir)
   if (is.null(rema)) {
-    rema = create.reg.match(project.dir)
+    rema = create.reg.match(project_dir)
   }
   rema
 }
 
-create.reg.match = function(project.dir) {
-  file = file.path(project.dir,"repbox/regmatch.Rds")
-  res = reg.match(project.dir)
+create.reg.match = function(project_dir) {
+  file = file.path(project_dir,"repbox/regmatch.Rds")
+  res = reg.match(project_dir)
   rema = res$mreg.df
   if (!is.null(mreg.df)) {
     saveRDS(rema, file)
@@ -29,56 +29,56 @@ create.reg.match = function(project.dir) {
   invisible(rema)
 }
 
-load.reg.match = function(project.dir) {
-  file = file.path(project.dir,"repbox/regmatch.Rds")
+load.reg.match = function(project_dir) {
+  file = file.path(project_dir,"repbox/regmatch.Rds")
   if (!file.exists(file)) return(NULL)
   readRDS(file)
 }
 
-load.or.make.artreg = function(project.dir) {
-  artreg.file = file.path(project.dir,"repbox/artreg.Rds")
+load.or.make.artreg = function(project_dir) {
+  artreg.file = file.path(project_dir,"repbox/artreg.Rds")
   if (file.exists(artreg.file)) {
     return(readRDS(artreg.file))
   }
 
-  return(make.artreg.rds(project.dir))
+  return(make.artreg.rds(project_dir))
 }
 
-make.artreg.rds = function(project.dir) {
-  arttab.file = file.path(project.dir,"repbox/arttab.Rds")
+make.artreg.rds = function(project_dir) {
+  arttab.file = file.path(project_dir,"repbox/arttab.Rds")
   if (!file.exists(arttab.file)) {
     return(NULL)
   }
   tab.df = readRDS(arttab.file)
   tab.df = add.reg.info.to.tab.df(tab.df)
   reg.df = tab.df.to.reg.df(tab.df)
-  reg.df$project = basename(project.dir)
-  saveRDS(reg.df, file.path(project.dir,"repbox/artreg.Rds"))
+  reg.df$project = basename(project_dir)
+  saveRDS(reg.df, file.path(project_dir,"repbox/artreg.Rds"))
   invisible(reg.df)
 }
 
 
-reg.match = function(project.dir, verbose=TRUE) {
+reg.match = function(project_dir, verbose=TRUE) {
   restore.point("repbox.reg.match")
-  repbox.dir = paste0(project.dir,"/repbox")
+  repbox.dir = paste0(project_dir,"/repbox")
 
   # aregs = article regressions extracted from pdf
   # cregs = code regressions extracted from running supplement
 
-  aregs = load.or.make.artreg(project.dir)
+  aregs = load.or.make.artreg(project_dir)
 
   # for debugging
   # aregs = filter(aregs, ar_num == 13)
 
   if (NROW(aregs)==0) {
-    cat(paste0("\n\tNo regression tables found in article of project ", project.dir))
+    cat(paste0("\n\tNo regression tables found in article of project ", project_dir))
     return(NULL)
   }
 
   cregs = readRDS(paste0(repbox.dir, "/stata/regtab.Rds"))
   if (NROW(cregs)==0) {
     if (verbose) {
-      cat(paste0("\n\tNo regressions were run for project ", project.dir))
+      cat(paste0("\n\tNo regressions were run for project ", project_dir))
       return(NULL)
     }
   }
@@ -89,7 +89,7 @@ reg.match = function(project.dir, verbose=TRUE) {
     mutate(ccoef.row = seq_len(n()))
   if (NROW(ccoef.df)==0) {
     if (verbose) {
-      cat(paste0("\n\tNo regression results obtained when running supplement for project ", project.dir))
+      cat(paste0("\n\tNo regression results obtained when running supplement for project ", project_dir))
       return(invisible())
     }
   }

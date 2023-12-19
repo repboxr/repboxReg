@@ -12,13 +12,13 @@
 example = function() {
   project = "aejapp_13_3_7"
   project = "testsupp"
-  project.dir = file.path("~/repbox/projects_reg",project)
+  project_dir = file.path("~/repbox/projects_reg",project)
 
   #dirs = repboxMain::get.ejd.projects(has.repbox.dir = TRUE)
-  #project.dir = sample(dirs,1)
-  #project.dir
+  #project_dir = sample(dirs,1)
+  #project_dir
 
-  rr = readRDS(file.path(project.dir,"repbox/stata/repbox_results.Rds"))
+  rr = readRDS(file.path(project_dir,"repbox/stata/repbox_results.Rds"))
   run.df = rr$run.df
   #set.seed(1234)
   dap = make.dap(run.df)
@@ -28,18 +28,18 @@ example = function() {
 
 
 
-get.project.dap = function(project.dir,make.if.missing=FALSE, add.run.df=FALSE) {
+get.project.dap = function(project_dir,make.if.missing=FALSE, add.run.df=FALSE) {
   restore.point("get.project.dap")
-  dap.file = file.path(project.dir,"metareg/dap/stata/dap.Rds")
+  dap.file = file.path(project_dir,"metareg/dap/stata/dap.Rds")
   if (file.exists(dap.file)) {
     dap = readRDS(dap.file)
     if (is.null(dap$version)) {
-      stop("Invalid DAP without version. Please remove DAP and cache file from project ", project.dir, " and create them again.")
+      stop("Invalid DAP without version. Please remove DAP and cache file from project ", project_dir, " and create them again.")
     }
 
     if (!add.run.df) return(dap)
 
-    rr.file = file.path(project.dir,"repbox/stata/repbox_results.Rds")
+    rr.file = file.path(project_dir,"repbox/stata/repbox_results.Rds")
     if (!file.exists(rr.file)) {
       cat("\nNo repbox results exists. Cannot make DAP.\n")
       return(NULL)
@@ -52,7 +52,7 @@ get.project.dap = function(project.dir,make.if.missing=FALSE, add.run.df=FALSE) 
   if (!make.if.missing) return(NULL)
 
   # No dap file exists: make a new one
-  rr.file = file.path(project.dir,"repbox/stata/repbox_results.Rds")
+  rr.file = file.path(project_dir,"repbox/stata/repbox_results.Rds")
   if (!file.exists(rr.file)) {
     cat("\nNo repbox results exists. Cannot make DAP.\n")
     return(NULL)
@@ -63,13 +63,13 @@ get.project.dap = function(project.dir,make.if.missing=FALSE, add.run.df=FALSE) 
 
 
 
-  dotab = readRDS.or.null(file.path(project.dir,"repbox/stata/dotab.Rds"))
+  dotab = readRDS.or.null(file.path(project_dir,"repbox/stata/dotab.Rds"))
 
   restore.point("get.project.dap2")
   #if (all(run.df$timevar == "")) stop()
 
 
-  dap = make.dap(run.df,dotab=dotab, extra.inf.dir = file.path(project.dir,"metareg/extra_infeasible"))
+  dap = make.dap(run.df,dotab=dotab, extra.inf.dir = file.path(project_dir,"metareg/extra_infeasible"))
   if (is.null(dap)) return(NULL)
 
   dap.dir = dirname(dap.file)

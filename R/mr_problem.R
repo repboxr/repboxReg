@@ -61,9 +61,9 @@ get_repbox_problem_step = function(step) {
 
 
 clear_problem_files = function(mr) {
-  problem.file = file.path(mr$project.dir,"metareg",mr$metaid,"has_problem")
+  problem.file = file.path(mr$project_dir,"metareg",mr$metaid,"has_problem")
   if (file.exists(problem.file)) file.remove(problem.file)
-  problem.file = file.path(mr$project.dir,"metareg",mr$metaid,"no_reg")
+  problem.file = file.path(mr$project_dir,"metareg",mr$metaid,"no_reg")
   if (file.exists(problem.file)) file.remove(problem.file)
 }
 
@@ -73,7 +73,7 @@ mr_set_problem = function(mr, problem, msg=NULL) {
   mr$has_problem = TRUE
   mr$problem=problem
   mr$problem_msg = paste0(problem,"\n", msg)
-  #problem.file = file.path(mr$project.dir,"metareg",mr$metaid,"has_problem")
+  #problem.file = file.path(mr$project_dir,"metareg",mr$metaid,"has_problem")
   #writeLines(problem.file, problem)
   if (!is.null(msg)) {
     cat("\n",msg,"\n")
@@ -83,13 +83,13 @@ mr_set_problem = function(mr, problem, msg=NULL) {
 
 mr_has_problem = function(mr) {
   if (isTRUE(mr$has_problem)) return(TRUE)
-  problem.file = file.path(mr$project.dir,"metareg",mr$metaid,"has_problem")
+  problem.file = file.path(mr$project_dir,"metareg",mr$metaid,"has_problem")
   file.exists(problem.file)
 }
 
 
 mr_write_empty_study = function(mr) {
-  file = file.path(mr$project.dir,"metareg",mr$metaid,"no_reg")
+  file = file.path(mr$project_dir,"metareg",mr$metaid,"no_reg")
   writeLines("TRUE", file)
   return(invisible(mr))
 }

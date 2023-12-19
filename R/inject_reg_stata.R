@@ -5,7 +5,7 @@
 injection.reg = function(txt, lines=seq_along(txt),do, opts=rbs.opts()) {
   restore.point("injection.reg")
 
-  repbox.dir = file.path(do$project.dir,"repbox/stata")
+  repbox.dir = file.path(do$project_dir,"repbox/stata")
   res.dir = file.path(repbox.dir,"tsv")
 
   res.files = paste0(res.dir,"/",do$donum,"_",  lines,"_`repbox_local_cmd_count'",".dta")
@@ -33,7 +33,7 @@ display "#~# END INJECT REG_ERETURN ',do$donum,' ', lines,' `repbox_local_cmd_co
 injection.reg.old = function(txt, lines=seq_along(txt),do, opts=rbs.opts()) {
   restore.point("injection.reg")
 
-  repbox.dir = file.path(do$project.dir,"repbox/stata")
+  repbox.dir = file.path(do$project_dir,"repbox/stata")
   tsv.dir = file.path(repbox.dir,"tsv")
 
   tsv.files = paste0(tsv.dir,"/",do$donum,"_",  lines,"_`repbox_local_cmd_count'",".tsv")

@@ -9,15 +9,15 @@ example.vi.from.stata.reg = function() {
   library(repboxReg)
 
   project = "testsupp"
-  project.dir = file.path("~/repbox/projects_reg",project)
-  run.project.with.reg(project.dir)
+  project_dir = file.path("~/repbox/projects_reg",project)
+  run.project.with.reg(project_dir)
 
-  reg.df = readRDS(file.path(project.dir, "repbox/stata/regtab.Rds"))
+  reg.df = readRDS(file.path(project_dir, "repbox/stata/regtab.Rds"))
   reg.df$creg.num = seq_len(NROW(reg.df))
   reg.df = stata.regs.add.parsing.info(reg.df)
   reg.df$depvar
   reg = reg.df[3,]
-  dat = load.reg.dta(project.dir, reg)
+  dat = load.reg.dta(project_dir, reg)
 
   #reg$cols_info = list(make_cols_info(dat))
   #cols_info = list(make_cols_info(dat))
@@ -29,7 +29,7 @@ example.vi.from.stata.reg = function() {
   reg$depvar
 
 
-  rstudioapi::filesPaneNavigate(paste0(project.dir,"/repbox"))
+  rstudioapi::filesPaneNavigate(paste0(project_dir,"/repbox"))
   rstudioapi::filesPaneNavigate("~/repbox/repboxReg/R")
   rstudioapi::filesPaneNavigate("~/repbox/repboxStata/R")
 

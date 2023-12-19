@@ -1,6 +1,6 @@
 
 make.repex.project = function() {
-  sup.dir = file.path(project.dir, "org")
+  sup.dir = file.path(project_dir, "org")
   if (!dir.exists(sup.dir)) dir.create(sup.dir, recursive = TRUE)
 
   code = readLines(file.path(repex.dir,"stata_code.do"))
@@ -17,11 +17,11 @@ library(repboxMain)
 library(repboxStata)
 library(repboxReg)
 
-update.repbox.project(project.dir,stata.opts = repbox.stata.opts(all.do.timeout = 60*5,timeout = 60*5), run.lang = "stata",make.html = FALSE,make.matching = FALSE)
-dap_and_cache_remove_from_project(project.dir)
+update.repbox.project(project_dir,stata.opts = repbox.stata.opts(all.do.timeout = 60*5,timeout = 60*5), run.lang = "stata",make.html = FALSE,make.matching = FALSE)
+dap_and_cache_remove_from_project(project_dir)
 
-run.project.with.reg(project.dir)
+run.project.with.reg(project_dir)
 
-mr = mr_base_run_study(project.dir, stop.on.error = TRUE,create.regdb = TRUE)
+mr = mr_base_run_study(project_dir, stop.on.error = TRUE,create.regdb = TRUE)
 
-rstudioapi::filesPaneNavigate(project.dir)
+rstudioapi::filesPaneNavigate(project_dir)

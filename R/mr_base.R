@@ -10,18 +10,18 @@ example = function() {
   # check.stata.paths()
   #
   # project = "testsupp"
-  # project.dir = file.path("C:/libraries/repbox/projects_reg/",project)
+  # project_dir = file.path("C:/libraries/repbox/projects_reg/",project)
 
   project = "testsupp"
-  project.dir = file.path("~/repbox/projects_reg",project)
+  project_dir = file.path("~/repbox/projects_reg",project)
   #run.df = readRDS("~/repbox/projects_reg/testsupp/repbox/stata/repbox_results.Rds")$run.df
   #all(run.df$timevar=="")
   steps = repbox_run_steps_from(reproduction=TRUE,art = FALSE,html = TRUE)
-  repbox_run_project(project.dir,steps = steps)
-  rstudioapi::filesPaneNavigate(project.dir)
+  repbox_run_project(project_dir,steps = steps)
+  rstudioapi::filesPaneNavigate(project_dir)
 
   options(warn=2)
-  mr = mr_base_run_study(project.dir, stop.on.error = TRUE,create.regdb = TRUE)
+  mr = mr_base_run_study(project_dir, stop.on.error = TRUE,create.regdb = TRUE)
 
   step.df = mr$step.df
   regcheck = mr$results$agg$regcheck
@@ -31,25 +31,25 @@ example = function() {
 }
 
 
-mr_base_run_study = function(project.dir, run.stata=TRUE, astep = NULL, extra.cache=is.null(astep), stop.on.error = FALSE, create.regdb = TRUE, stata_version = NA) {
+mr_base_run_study = function(project_dir, run.stata=TRUE, astep = NULL, extra.cache=is.null(astep), stop.on.error = FALSE, create.regdb = TRUE, stata_version = NA) {
   restore.point("mr_base_run_study")
 
-  #project.dir = file.path("~/repbox/projects_reg/testsupp")
-  #project.dir = file.path("~/repbox/projects_reg/aer_103_3_14")
-  project = basename(project.dir)
+  #project_dir = file.path("~/repbox/projects_reg/testsupp")
+  #project_dir = file.path("~/repbox/projects_reg/aer_103_3_14")
+  project = basename(project_dir)
 
-  res = dap_and_cache_check_outdated(project.dir)
+  res = dap_and_cache_check_outdated(project_dir)
   if (!res$ok) {
     stop(res$msg)
   }
 
-  dap = get.project.dap(project.dir,make.if.missing = TRUE, add.run.df = TRUE)
+  dap = get.project.dap(project_dir,make.if.missing = TRUE, add.run.df = TRUE)
   step.df = dap$step.df
   #plot.dap(dap)
 
   opts = mr_opts(load.extra.cache = extra.cache, extra.cache=extra.cache, stop.on.error = stop.on.error,pass.internal.info = TRUE, pass.regdb.info = FALSE, stata.preserve.always=TRUE)
 
-  mr = mr_init_study(project.dir,
+  mr = mr_init_study(project_dir,
     metaid="base", version=0,
     stata_code_fun=mr_base_stata_code_fun,
     step_run_fun = mr_base_step_run_fun,
@@ -116,7 +116,7 @@ mr_base_stata_agg_fun = function(mr, stata_check_df, ...) {
   restore.point("mr_base_stata_agg_fun")
 
   # Regression results from original run
-  regtab.file = file.path(mr$project.dir,"repbox/stata/regtab.Rds")
+  regtab.file = file.path(mr$project_dir,"repbox/stata/regtab.Rds")
   org_regs = readRDS.or.null(regtab.file)
 
   for (i in seq_len(NROW(org_regs))) {
@@ -168,7 +168,7 @@ mr_base_stata_agg_fun = function(mr, stata_check_df, ...) {
 
 mr_base_study_agg_fun = function(mr, ...) {
   restore.point("mr_base_study_agg_fun")
-  project = basename(mr$project.dir)
+  project = basename(mr$project_dir)
 
   stata_agg = mr_get_result(mr, "stata_agg")
   org_regs = stata_agg$org_regs
@@ -217,7 +217,7 @@ mr_base_study_agg_fun = function(mr, ...) {
   mr = mr_set_header(mr, regcheck)
 
   agg = list(
-    project = basename(mr$project.dir),
+    project = basename(mr$project_dir),
     header = mr_get_header(mr),
     regcheck = regcheck,
     vi_df = vi_df,
@@ -406,7 +406,7 @@ mr_base_if_store_code = function(mr, step) {
   # translate to R
   if (!has.substr(if_str,"(")) return(NULL)
 
-  dir = file.path(mr$project.dir,"metareg","dap","stata", "ifrows")
+  dir = file.path(mr$project_dir,"metareg","dap","stata", "ifrows")
   if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
   file = paste0(dir,"/ifrows_", step, ".dta")
 

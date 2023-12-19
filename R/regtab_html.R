@@ -1,10 +1,10 @@
 
-do.overview.html = function(project.dir, su, ma) {
+do.overview.html = function(project_dir, su, ma) {
   restore.point("do.overview.html")
 
-  sup.dir = file.path(project.dir,"mod")
+  sup.dir = file.path(project_dir,"mod")
   # Do files overview
-  do.files = get.project.do.files(project.dir)
+  do.files = get.project.do.files(project_dir)
   #do.files = list.files(sup.dir,glob2rx("*.do"),full.names = TRUE,recursive = TRUE)
   #do.files = do.files[!startsWith(basename(do.files),"repbox_")]
 
@@ -184,9 +184,9 @@ do.overview.html = function(project.dir, su, ma) {
 
 
 # Code with regression tables overview
-tab.overview.html = function(project.dir, su=NULL, ma=NULL, show.figure=FALSE, show.unknown=TRUE, show.reg=FALSE) {
+tab.overview.html = function(project_dir, su=NULL, ma=NULL, show.figure=FALSE, show.unknown=TRUE, show.reg=FALSE) {
   restore.point("tab.overview.html")
-  adf = readRDS.or.null(paste0(project.dir, "/repbox/arttab.Rds"))
+  adf = readRDS.or.null(paste0(project_dir, "/repbox/arttab.Rds"))
 
   if (!show.figure & !is.null(adf)) {
     adf = filter(adf, !startsWith(tabname,"Figure"))
@@ -199,9 +199,9 @@ tab.overview.html = function(project.dir, su=NULL, ma=NULL, show.figure=FALSE, s
   h = "<h4>Extracted Tables from PDF</h4>"
   if (is.null(adf)) {
     h = paste0(h, "<p>No tables extracted from PDF.</p>")
-    files = list.files(paste0(project.dir,"/pdf"),glob2rx("*.pdf"),ignore.case = TRUE)
+    files = list.files(paste0(project_dir,"/pdf"),glob2rx("*.pdf"),ignore.case = TRUE)
     if (length(files)==0) {
-      h = paste0(h, "<p>Likely reason: no pdf file was copied to:<br>", paste0(project.dir,"/pdf"), "</p>")
+      h = paste0(h, "<p>Likely reason: no pdf file was copied to:<br>", paste0(project_dir,"/pdf"), "</p>")
     }
     return(h)
   }
@@ -280,10 +280,10 @@ tab.overview.html = function(project.dir, su=NULL, ma=NULL, show.figure=FALSE, s
   h = paste0(h, tab.html)
   return(h)
 }
-project.tab.tabs.html = function(project.dir,  ma = readRDS.or.null(paste0(project.dir,"/repbox/matched_tabs.Rds")), su = readRDS.or.null(paste0(project.dir,"/repbox/stata/repbox_results.Rds")), show.figure=FALSE, show.unknown=TRUE, show.reg = FALSE) {
+project.tab.tabs.html = function(project_dir,  ma = readRDS.or.null(paste0(project_dir,"/repbox/matched_tabs.Rds")), su = readRDS.or.null(paste0(project_dir,"/repbox/stata/repbox_results.Rds")), show.figure=FALSE, show.unknown=TRUE, show.reg = FALSE) {
   restore.point("project.tab.tabs.html")
 
-  tabs.df = readRDS.or.null(paste0(project.dir,"/repbox/arttab.Rds"))
+  tabs.df = readRDS.or.null(paste0(project_dir,"/repbox/arttab.Rds"))
 
   if (NROW(tabs.df)==0) {
     return("<p>No table has been extracted from the PDF.</p>")

@@ -31,11 +31,11 @@ mr_specify_used_reg = function(mr, reg_df) {
 mr_projects_have_file = function(parent.dir, files) {
   restore.point("mr_projects_have_file")
 
-  mr_for_all_projects(parent.dir, verbose=FALSE, function(project.dir) {
-    res = tibble(project = basename(project.dir))
+  mr_for_all_projects(parent.dir, verbose=FALSE, function(project_dir) {
+    res = tibble(project = basename(project_dir))
     for (file in files) {
       base = basename(file)
-      res[[base]] = file.exists(file.path(project.dir, file))
+      res[[base]] = file.exists(file.path(project_dir, file))
     }
     res
   }) %>% bind_rows()
@@ -53,14 +53,14 @@ mr_for_all_projects = function(parent.dir, fun, project.dirs, verbose=TRUE, stop
   }
 
   res = lapply(seq_along(project.dirs), function(i) {
-    project.dir = project.dirs[i]
+    project_dir = project.dirs[i]
     if (verbose) {
       cat("\n", i, " of ", length(project.dirs), " ", basename(project), "\n")
     }
     if (stop.on.error) {
-      res = fun(project.dir)
+      res = fun(project_dir)
     } else {
-      res = try(fun(project.dir))
+      res = try(fun(project_dir))
     }
     if (store.results) return(res)
     return(NULL)

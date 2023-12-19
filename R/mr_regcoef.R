@@ -1,6 +1,6 @@
 # Helper function for regcoef (regdb table)
 
-parmest_output_to_regcoef = function(mr, variant,  prefix, artid = basename(mr$project.dir),missing.step = c("stop","ignore")[1]) {
+parmest_output_to_regcoef = function(mr, variant,  prefix, artid = basename(mr$project_dir),missing.step = c("stop","ignore")[1]) {
   restore.point("parmest_output_to_regcoef")
   co = mr_agg_stata_parmest(mr,file_prefix = prefix, missing.step=missing.step)
   co = ct_to_regcoef(co, "stata", variant=variant, artid=artid)

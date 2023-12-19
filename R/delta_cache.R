@@ -23,11 +23,11 @@ example = function() {
 
   cc = projects.count.caches("~/repbox/projects_reg")
 
-  project.dir = "~/repbox/projects_reg/aejapp_2_4_8"
-  project.dir = "~/repbox/projects_reg/aejapp_3_2_2"
-  res = make_delta_caches(project.dir)
+  project_dir = "~/repbox/projects_reg/aejapp_2_4_8"
+  project_dir = "~/repbox/projects_reg/aejapp_3_2_2"
+  res = make_delta_caches(project_dir)
 
-  infos = mr_make_all_cache_infos(project.dir)
+  infos = mr_make_all_cache_infos(project_dir)
   comp_df = compare_all_cache_infos(infos)
   dci_df = make_delta_cache_graph(comp_df)
 }
@@ -41,20 +41,20 @@ example = function() {
 # If we store deltas from deltas only for simple column drops
 #
 
-make_delta_caches = function(project.dir) {
+make_delta_caches = function(project_dir) {
   restore.point("make_all_delta_cache")
 
 
-  delta.cache.dir = file.path(project.dir, "metareg","dap","stata", "delta_cache")
+  delta.cache.dir = file.path(project_dir, "metareg","dap","stata", "delta_cache")
   if (!dir.exists(delta.cache.dir)) dir.create(delta.cache.dir)
 
   cat(paste0(
 "\n*****************************************************************",
-"\nMake delta caches for ", project.dir,
+"\nMake delta caches for ", project_dir,
 "\n*****************************************************************"))
 
   cat("\n1. Make cache infos... ")
-  infos = mr_make_all_cache_infos(project.dir)
+  infos = mr_make_all_cache_infos(project_dir)
   cat(" done for ", length(infos),"caches.\n")
   cat("\n2. Make delta cache infos... ")
   comp_df = compare_all_cache_infos(infos)
@@ -73,7 +73,7 @@ make_delta_caches = function(project.dir) {
 
   for (row in dat_rows) {
     dci = dci_df[row,]
-    cache.file = mr_get_cache_file(project.dir, step = dci$step)
+    cache.file = mr_get_cache_file(project_dir, step = dci$step)
     org_dat = haven::read_dta(cache.file)
     delta_dat = delta_cache_make_data(org_dat, dci)
     delta.cache.file = file.path(delta.cache.dir, paste0("delta_", dci$step,".dta"))
@@ -349,8 +349,8 @@ delta.cache.find.circle.cut.rows = function(df) {
   cut_rows
 }
 
-mr_make_all_cache_infos = function(project.dir) {
-  cache_df = mr_get_cache_df(project.dir)
+mr_make_all_cache_infos = function(project_dir) {
+  cache_df = mr_get_cache_df(project_dir)
   infos = lapply(seq_rows(cache_df), function(i) {
     file = cache_df$file[[i]]
     dat = haven::read_dta(file)
@@ -689,12 +689,12 @@ example = function() {
 
 projects.count.caches = function(projects.dir) {
   project.dirs = list.dirs(projects.dir, full.names=TRUE, recursive = FALSE )
-  project.dir = first(project.dirs)
-  counts = lapply(project.dirs, function(project.dir) {
-    cache.dir = paste0(file.path(project.dir,"metareg","dap","stata"),c("/cache","extra_cache"))
+  project_dir = first(project.dirs)
+  counts = lapply(project.dirs, function(project_dir) {
+    cache.dir = paste0(file.path(project_dir,"metareg","dap","stata"),c("/cache","extra_cache"))
     cache.files = list.files(cache.dir, glob2rx("*.dta"),full.names = TRUE)
     mb=sum(file.size(cache.files), na.rm=TRUE) / 1e6
-    tibble(project.dir = project.dir, num_caches = length(cache.files), total_mb = mb)
+    tibble(project_dir = project_dir, num_caches = length(cache.files), total_mb = mb)
   }) %>% bind_rows()
   counts
 }

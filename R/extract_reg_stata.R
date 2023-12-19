@@ -2,15 +2,15 @@
 #
 # Extracts specified regression information
 #
-extract.stata.regs = function(project.dir, run.df=NULL, dotab=NULL, save=TRUE) {
+extract.stata.regs = function(project_dir, run.df=NULL, dotab=NULL, save=TRUE) {
   restore.point("extract.stata.regs")
 
-  project = basename(project.dir)
+  project = basename(project_dir)
   #++++++++++++++++++++++++++++++++++++++++++++++++++
   # 1. Extract TSV information stored by esttab
   #++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  res.dir = file.path(project.dir,"repbox/stata/tsv")
+  res.dir = file.path(project_dir,"repbox/stata/tsv")
   files = list.files(res.dir,glob2rx(paste0("*.dta")),full.names = TRUE)
 
   bfiles = basename(files)
@@ -43,7 +43,7 @@ extract.stata.regs = function(project.dir, run.df=NULL, dotab=NULL, save=TRUE) {
   # 2. Extract regression information stored in logs
   #++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  dir = file.path(project.dir, "repbox/stata/logs")
+  dir = file.path(project_dir, "repbox/stata/logs")
   log.files = list.files(dir,glob2rx("log_*.log"),full.names = TRUE)
 
   reg.log = lapply(log.files, function(file) {
@@ -72,7 +72,7 @@ extract.stata.regs = function(project.dir, run.df=NULL, dotab=NULL, save=TRUE) {
 
 
   if (save) {
-    saveRDS(regtab, file.path(project.dir,"repbox/stata/regtab.Rds"))
+    saveRDS(regtab, file.path(project_dir,"repbox/stata/regtab.Rds"))
   }
 
   regtab
@@ -114,7 +114,7 @@ parse.ereturn.injection = function(str) {
 
 
 # Still uses tsv
-extract.stata.regs.old = function(project.dir, run.df=NULL, dotab=NULL, save=TRUE) {
+extract.stata.regs.old = function(project_dir, run.df=NULL, dotab=NULL, save=TRUE) {
   restore.point("extract.stata.regs")
 
 
@@ -122,7 +122,7 @@ extract.stata.regs.old = function(project.dir, run.df=NULL, dotab=NULL, save=TRU
   # 1. Extract TSV information stored by esttab
   #++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  tsv.dir = file.path(project.dir,"repbox/stata/tsv")
+  tsv.dir = file.path(project_dir,"repbox/stata/tsv")
   files = list.files(tsv.dir,glob2rx(paste0("*.tsv")),full.names = TRUE)
 
   bfiles = basename(files)
@@ -157,7 +157,7 @@ extract.stata.regs.old = function(project.dir, run.df=NULL, dotab=NULL, save=TRU
   # 2. Extract regression information stored in logs
   #++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  dir = file.path(project.dir, "repbox/stata/logs")
+  dir = file.path(project_dir, "repbox/stata/logs")
   log.files = list.files(dir,glob2rx("log_*.log"),full.names = TRUE)
 
   reg.log = lapply(log.files, function(file) {
@@ -186,7 +186,7 @@ extract.stata.regs.old = function(project.dir, run.df=NULL, dotab=NULL, save=TRU
 
 
   if (save) {
-    saveRDS(regtab, file.path(project.dir,"repbox/stata/regtab.Rds"))
+    saveRDS(regtab, file.path(project_dir,"repbox/stata/regtab.Rds"))
   }
 
   regtab

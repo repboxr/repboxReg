@@ -14,28 +14,28 @@ example = function() {
   fe
   project = "aer_100_3_26"
   project = "testsupp"
-  #project.dir = file.path("~/repbox/projects_reg",project)
-  project.dir = file.path("C:/libraries/repbox/projects_reg",project)
+  #project_dir = file.path("~/repbox/projects_reg",project)
+  project_dir = file.path("C:/libraries/repbox/projects_reg",project)
 
   if (FALSE) {
-    update.repbox.project(project.dir,run.lang = "stata")
-    run.project.with.reg(project.dir,overwrite.dap = TRUE, make.dap = TRUE)
-    res = mr_base_run_study(project.dir, stop.on.error = TRUE)
+    update.repbox.project(project_dir,run.lang = "stata")
+    run.project.with.reg(project_dir,overwrite.dap = TRUE, make.dap = TRUE)
+    res = mr_base_run_study(project_dir, stop.on.error = TRUE)
 
   }
-  res = mr_base_aggregate_again(project.dir)
+  res = mr_base_aggregate_again(project_dir)
   agg = res$agg
 
-  ejd_to_regdb(project.dir)
+  ejd_to_regdb(project_dir)
 
 
   res$agg$same_df
-  rstudioapi::filesPaneNavigate(project.dir)
+  rstudioapi::filesPaneNavigate(project_dir)
 
 
-  res = mr_base_aggregate_again(project.dir)
+  res = mr_base_aggregate_again(project_dir)
   res$agg$same.df
-  rstudio_job("mr_base", mr_base_run_study(project.dir), libs="repboxReg")
+  rstudio_job("mr_base", mr_base_run_study(project_dir), libs="repboxReg")
 
 }
 
@@ -79,7 +79,7 @@ mr_load_parcels = function(mr, parcels, if.missing = c("stop","warn", "ignore")[
   restore.point("mr_load_parcels")
   parcel = parcels
   if (is.null(mr$parcel_list_df)) {
-    mr$parcel_list_df = regdb_list_project_parcels(mr$project.dir)
+    mr$parcel_list_df = regdb_list_project_parcels(mr$project_dir)
   }
   if (is.null(mr[["parcels"]])) {
     mr$parcels = list()
@@ -93,9 +93,9 @@ mr_load_parcels = function(mr, parcels, if.missing = c("stop","warn", "ignore")[
   rows = which(df$parcel == parcel)
   if (length(rows)==0) {
     if (if.missing=="stop") {
-      stop(paste0("The regdb file for parcel ", parcel, " was not created for project ", mr$project.dir))
+      stop(paste0("The regdb file for parcel ", parcel, " was not created for project ", mr$project_dir))
     } else if (if.missing=="warn") {
-      warning(paste0("The regdb file for parcel ", parcel, " was not created for project ", mr$project.dir))
+      warning(paste0("The regdb file for parcel ", parcel, " was not created for project ", mr$project_dir))
     }
     return(mr)
   }
@@ -165,17 +165,17 @@ mr_get_reg = function(mr, step, allow.missing = !mr$opts$pass.regdb.info) {
 }
 
 
-base_to_regdb = function(mr = NULL, project.dir=mr$project.dir, agg=  readRDS(file.path(project.dir, "metareg/base/agg.Rds")), regdb.dir = mr$regdb.out.dir) {
+base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(file.path(project_dir, "metareg/base/agg.Rds")), regdb.dir = mr$regdb.out.dir) {
   restore.point("ejd_to_regdb")
 
-  project = artid = basename(project.dir)
+  project = artid = basename(project_dir)
   parcels = list()
 
   regdb.dir = mr$regdb.out.dir
-  #dap = readRDS(file.path(project.dir, "repbox/stata/dap.Rds"))
+  #dap = readRDS(file.path(project_dir, "repbox/stata/dap.Rds"))
 
   step.df = mr$step.df
-  dotab = readRDS(file.path(project.dir, "repbox/stata/dotab.Rds"))
+  dotab = readRDS(file.path(project_dir, "repbox/stata/dotab.Rds"))
 
 
 

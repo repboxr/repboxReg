@@ -11,31 +11,31 @@ examples = function() {
   project = "aejmac_11_3_1"
   project = "aejapp_3_2_2"
 
-  project.dir = file.path("~/repbox/projects_reg",project)
+  project_dir = file.path("~/repbox/projects_reg",project)
 
-  dap_and_cache_remove_from_project(project.dir)
+  dap_and_cache_remove_from_project(project_dir)
   #copy.ejd.project.to.reg(project)
-  update.repbox.project(project.dir,run.lang = "stata",make.matching = FALSE, make.html = FALSE)
+  update.repbox.project(project_dir,run.lang = "stata",make.matching = FALSE, make.html = FALSE)
 
-  run.project.with.reg(project.dir)
+  run.project.with.reg(project_dir)
 
   options(warn = 2)
-  mr = mr_base_run_study(project.dir, stata_version=17)
+  mr = mr_base_run_study(project_dir, stata_version=17)
 
 
-  rstudioapi::filesPaneNavigate(paste0(project.dir,"/repbox"))
+  rstudioapi::filesPaneNavigate(paste0(project_dir,"/repbox"))
   rstudioapi::filesPaneNavigate("~/repbox/repboxReg/R")
   rstudioapi::filesPaneNavigate("~/repbox/repboxStata/R")
 }
 
-run.project.with.reg = function(project.dir,store.data.caches=TRUE, timeout = 60*5, make.matching = FALSE, make.html=FALSE) {
+run.project.with.reg = function(project_dir,store.data.caches=TRUE, timeout = 60*5, make.matching = FALSE, make.html=FALSE) {
   restore.point("run.project.with.reg")
   library(repboxMain)
 
-  dap = get.project.dap(project.dir, make.if.missing = TRUE)
+  dap = get.project.dap(project_dir, make.if.missing = TRUE)
 
   if (store.data.caches) {
-    cache.dir = file.path(project.dir, "metareg/dap/stata/cache")
+    cache.dir = file.path(project_dir, "metareg/dap/stata/cache")
     if (!dir.exists(cache.dir)) dir.create(cache.dir,recursive = TRUE)
     store.data = dap.to.store.data(dap, cache.dir)
   } else {
@@ -45,19 +45,19 @@ run.project.with.reg = function(project.dir,store.data.caches=TRUE, timeout = 60
   stata.opts = repbox.stata.opts(report.inside.program = TRUE,all.do.timeout = timeout,timeout = timeout,extract.reg.info = TRUE, store.data = store.data)
 
 
-  cat("\nInit repbox for ", project.dir)
-  init.repbox.project(project.dir)
+  cat("\nInit repbox for ", project_dir)
+  init.repbox.project(project_dir)
 
   cat("\nExtract article tables.")
-  #repbox.extract.art.tabs(project.dir)
+  #repbox.extract.art.tabs(project_dir)
 
   cat("\nUpdate repbox...")
-  update.repbox.project(project.dir,run.lang = "stata", make.matching = make.matching, make.html=make.html, make.ejd.html=FALSE, make.report.html = FALSE, make.rstudio.html = FALSE, stata.opts = stata.opts)
+  update.repbox.project(project_dir,run.lang = "stata", make.matching = make.matching, make.html=make.html, make.ejd.html=FALSE, make.report.html = FALSE, make.rstudio.html = FALSE, stata.opts = stata.opts)
 
 }
 
-load.reg.dta = function(project.dir, reg=NULL, donum=reg$donum, line=reg$line, counter=reg$counter) {
-  file = file.path(project.dir, "repbox/stata/dta", paste0("reg_", donum,"_",line,"_",counter,".dta"))
+load.reg.dta = function(project_dir, reg=NULL, donum=reg$donum, line=reg$line, counter=reg$counter) {
+  file = file.path(project_dir, "repbox/stata/dta", paste0("reg_", donum,"_",line,"_",counter,".dta"))
   if (!file.exists(file)) {
     cat("\nNo dta file for this regression stored.\n")
     return(NULL)
@@ -84,15 +84,15 @@ create.repbox.reg.project.from.ejd = function(project=NULL) {
   copy.ejd.project.to.reg(project)
 
   # Run one time without DAP
-  if (!file.exists(paste0(project.dir,"/repbox/metareg_was_run.txt"))) {
-    run.project.with.reg(project.dir, make.dap = FALSE)
-    writeLines("yes",paste0(project.dir,"/repbox/metareg_was_run.txt"))
+  if (!file.exists(paste0(project_dir,"/repbox/metareg_was_run.txt"))) {
+    run.project.with.reg(project_dir, make.dap = FALSE)
+    writeLines("yes",paste0(project_dir,"/repbox/metareg_was_run.txt"))
 
   }
-  run.project.with.reg(project.dir,overwrite.dap = TRUE, make.dap = TRUE)
-  writeLines("yes",paste0(project.dir,"/repbox/metareg_was_run.txt"))
+  run.project.with.reg(project_dir,overwrite.dap = TRUE, make.dap = TRUE)
+  writeLines("yes",paste0(project_dir,"/repbox/metareg_was_run.txt"))
 
-  mr = mr_base_run_study(project.dir, run.stata=TRUE)
+  mr = mr_base_run_study(project_dir, run.stata=TRUE)
 
   if (FALSE) {
     plot.dap(mr)
@@ -108,11 +108,11 @@ create.repbox.reg.project.from.ejd = function(project=NULL) {
     agg$stata.r.coef.same
     agg$stata.r.same
 
-    rstudioapi::filesPaneNavigate(paste0(project.dir,"/metareg"))
+    rstudioapi::filesPaneNavigate(paste0(project_dir,"/metareg"))
     rstudioapi::filesPaneNavigate("~/repbox/repboxReg/R")
 
 
-    dap = get.project.dap(project.dir)
+    dap = get.project.dap(project_dir)
     plot.dap(dap)
   }
 }
@@ -122,7 +122,7 @@ copy.ejd.project.to.reg = function(project=NULL) {
 
   ejd.projects.dir = "~/repbox/projects_ejd"
   reg.projects.dir = "~/repbox/projects_reg"
-  project.dir = file.path("~/repbox/projects_reg",project)
+  project_dir = file.path("~/repbox/projects_reg",project)
 
   copy.dir(file.path(ejd.projects.dir,project), file.path(reg.projects.dir,project))
 
