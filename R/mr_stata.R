@@ -49,7 +49,7 @@ mr_run_all_stata_code = function(mr, nostop = FALSE) {
   do.files = list.files(code.dir, glob2rx("*.do"), full.names = TRUE)
   for (do.file in do.files) {
     #cat("\nRun", do.file,"\n")
-    run.stata.do(do.file, nostop = FALSE)
+    run_stata_do(do.file, nostop = FALSE)
   }
 
   file = first(do.files)

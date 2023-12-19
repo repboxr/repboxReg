@@ -130,7 +130,7 @@ mr_get_cache_file = function(project_dir=project_dir, step, check.exists=FALSE) 
 mr_make_extra_cache = function(mr, step) {
   restore.point("make_extra_cache")
   code.file = write_extra_cache_code(mr, step)
-  run.stata.do(code.file)
+  run_stata_do(code.file)
 
   cache.dir = paste0(mr$project_dir,"/metareg/dap/stata/extra_cache")
   cache.file = file.path(cache.dir, paste0("step_", step, ".dta"))
