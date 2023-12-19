@@ -17,7 +17,7 @@ library(repboxMain)
 library(repboxStata)
 library(repboxReg)
 
-update.repbox.project(project_dir,stata.opts = repbox.stata.opts(all.do.timeout = 60*5,timeout = 60*5), run.lang = "stata",make.html = FALSE,make.matching = FALSE)
+update.repbox.project(project_dir,stata_opts = repbox_stata_opts(all.do.timeout = 60*5,timeout = 60*5), run.lang = "stata",make.html = FALSE,make.matching = FALSE)
 dap_and_cache_remove_from_project(project_dir)
 
 run.project.with.reg(project_dir)

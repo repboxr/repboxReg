@@ -42,7 +42,7 @@ run.project.with.reg = function(project_dir,store.data.caches=TRUE, timeout = 60
     store.data = NULL
   }
 
-  stata.opts = repbox.stata.opts(report.inside.program = TRUE,all.do.timeout = timeout,timeout = timeout,extract.reg.info = TRUE, store.data = store.data)
+  stata_opts = repbox_stata_opts(report.inside.program = TRUE,all.do.timeout = timeout,timeout = timeout,extract.reg.info = TRUE, store.data = store.data)
 
 
   cat("\nInit repbox for ", project_dir)
@@ -52,7 +52,7 @@ run.project.with.reg = function(project_dir,store.data.caches=TRUE, timeout = 60
   #repbox.extract.art.tabs(project_dir)
 
   cat("\nUpdate repbox...")
-  update.repbox.project(project_dir,run.lang = "stata", make.matching = make.matching, make.html=make.html, make.ejd.html=FALSE, make.report.html = FALSE, make.rstudio.html = FALSE, stata.opts = stata.opts)
+  update.repbox.project(project_dir,run.lang = "stata", make.matching = make.matching, make.html=make.html, make.ejd.html=FALSE, make.report.html = FALSE, make.rstudio.html = FALSE, stata_opts = stata_opts)
 
 }
 
