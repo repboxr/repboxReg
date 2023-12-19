@@ -149,6 +149,7 @@ mr_base_stata_agg_fun = function(mr, stata_check_df, ...) {
     stata_ct = filter(stata_ct, variant == "sb")
     extra$ct = ct_to_regcoef(extra$ct, artid=mr$artid)
   }
+
   extra$scalars = filter(stata_scalars, variant != "sb")
   if (NROW(extra$scalars)>0) {
     stata_scalars = filter(stata_scalars, variant == "sb")

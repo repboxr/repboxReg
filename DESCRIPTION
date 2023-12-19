@@ -5,10 +5,10 @@ Version: 0.1.0
 Author: Sebastian Kranz (Ulm University)
 Maintainer: Sebastian Kranz <sebastian.kranz@uni-ulm.de>
 Description: Repbox module for analysing regressions
-License: Not yet licensed. Not yet in public domain
+License: GPL >= 3.0
 Remotes: skranz/stringtools, skranz/dbmisc
 Depends: dplyr, data.table, restorepoint, dbmisc, stringtools,
          tidyr, fixest, collapse,
-         igraph, repboxDB
+         igraph, repboxDB, rio
 Encoding: UTF-8
 LazyData: true
