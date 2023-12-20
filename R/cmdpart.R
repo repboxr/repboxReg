@@ -252,7 +252,7 @@ cmdparts_of_stata_reg = function(cmdlines) {
     rv = parse.stata.reg.vars(cmds[i], varlists[i])
 
     # The varlist contains another cmd specifier (case for ivregress)
-    if (!is.empty(rv$method)) {
+    if (!is_empty(rv$method)) {
       cp$str[i] = gsub("{{varlist}}","{{subcmd}} {{varlist}}", cp$str[[i]], fixed=TRUE)
       cp$start[i] = cp$start[i] + 11
       cp = cp_add_part_in_df(cp, str_rows = i, part = "subcmd", content = rv$method)
@@ -270,7 +270,7 @@ cmdparts_of_stata_reg = function(cmdlines) {
       rep("instr", length(instr))
     )
     cp = cp_add_part_in_df(cp, str_rows = i, part = "v", content=vars, tag=tags, counter=seq_along(vars), parent="varlist")
-    if (is.empty(endo)) {
+    if (is_empty(endo)) {
       cont = paste0("{{v", seq_along(vars),"}}", collapse=" ")
     } else {
       len1 = length(rv$depvar) + length(exo)

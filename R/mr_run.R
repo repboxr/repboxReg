@@ -504,10 +504,10 @@ mr_create_stata_timeseries_var = function(dat,var, prefix,reg, sep=".") {
   }
 
   args = list(x=dat[[var]], n=1)
-  if (!is.empty(reg$timevar)) {
+  if (!is_empty(reg$timevar)) {
     args$t = dat[[reg$timevar]]
   }
-  if (!is.empty(reg$panelvar)) {
+  if (!is_empty(reg$panelvar)) {
     args$g = dat[[reg$panelvar]]
   }
 

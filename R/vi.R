@@ -49,7 +49,7 @@ vi.from.stata.reg = function(reg, dat) {
   # FE xtreg
   if (reg$cmd %in% c("xtreg") & "fe" %in% reg$opts.df[[1]]$opt) {
     fe.var = reg$panelvar
-    if (is.empty(fe.var)) {
+    if (is_empty(fe.var)) {
       stop("xtreg specifies fe but no panelvar is set")
     }
     vi = bind_rows(vi, tibble(ia_expr = fe.var, main_pos = NROW(vi)+1, is_ia=FALSE,role="exo", option="fe"))
@@ -62,7 +62,7 @@ vi.from.stata.reg = function(reg, dat) {
   }
 
   # Add weights var
-  if (!is.empty(reg$weights_var)) {
+  if (!is_empty(reg$weights_var)) {
     vi = bind_rows(vi, tibble(ia_expr = reg$weights_var, main_pos = 1, is_ia=FALSE,role="weight", option=""))
   }
 

@@ -76,7 +76,7 @@ stata2r.gen = function(code=tab$code, tab=NULL, just.chain=FALSE, add.comment=FA
   rhs = str.right.of(str, "=")
   rhs = replace.stata.rhs.na(rhs)
 
-  if (!is.empty(ifcode)) {
+  if (!is_empty(ifcode)) {
     restore.point("gen.ifcode")
 
     # A stata condition like x<-400
@@ -116,7 +116,7 @@ stata2r.egen = function(...) stata2r.gen(...)
 stata2r.keep =  function(code=tab$code, tab=NULL, just.chain=FALSE, add.comment=FALSE, drop=FALSE) {
   restore.point("stata2r.keep")
   links = NULL
-  if (!is.empty(tab$arg_str)) {
+  if (!is_empty(tab$arg_str)) {
     vars = separate.stata.arg.str(tab$arg_str)
     if (drop) {
       #links = paste0("select(", paste0("-",vars, collapse=", "),")")
@@ -126,7 +126,7 @@ stata2r.keep =  function(code=tab$code, tab=NULL, just.chain=FALSE, add.comment=
       links = paste0("keep.cols(c(", paste0('"',vars,'"', collapse=", "),"))")
     }
   }
-  if (!is.empty(tab$if_arg)) {
+  if (!is_empty(tab$if_arg)) {
     str = replace.stata.is.na(tab$if_arg)
     if (drop) {
       links = c(links,paste0("filter(!(", str, "))"))

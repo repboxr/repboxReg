@@ -363,10 +363,10 @@ create_prefix_nolevel_cterm_col = function(dat,cterm, panelvar=NA, timevar=NA, t
   }
 
   args = list(x=dat[[basevar]])
-  if (!is.empty(timevar)) {
+  if (!is_empty(timevar)) {
     args$t = dat[[timevar]]
   }
-  if (!is.empty(panelvar)) {
+  if (!is_empty(panelvar)) {
     args$g = dat[[panelvar]]
   }
 

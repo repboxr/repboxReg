@@ -52,7 +52,7 @@ make_default_reg_call = function(reg,command, allow.robust=TRUE, max.cluster=0, 
   vi = reg$vi[[1]]
   formula = vi_to_lm_iv_formula(vi)
   args = list(formula = formula)
-  if (!is.empty(reg$weights_var)) {
+  if (!is_empty(reg$weights_var)) {
     if (!allow.weights) {
       ti$weights_ok = FALSE
     } else {

@@ -27,7 +27,7 @@ make_quantreg_call = function(reg, call.summary = FALSE, ...) {
   command = "rq"
 
   weights = NULL
-  if (!is.empty(reg$weights_var)) {
+  if (!is_empty(reg$weights_var)) {
     weights = as.formula(paste0("~", reg$weights_var))
   }
   summary.args = list()

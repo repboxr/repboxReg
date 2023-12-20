@@ -83,7 +83,7 @@ make_fixest_call = function(reg, min_fe_level = 50, call.summary = TRUE,...) {
     command = "feglm"
     fixest.args = list(family=binomial(link = "probit"))
   }
-  if (!is.empty(reg$weights_var)) {
+  if (!is_empty(reg$weights_var)) {
     fixest.args$weights = as.formula(paste0("~", reg$weights_var))
   }
   list(
