@@ -2,7 +2,7 @@
 
 
 mr_base_variant = function(mr) {
-  mr$regdb$reg
+  mr$repdb$reg
 }
 
 mr_uses_no_reg = function(mr) {

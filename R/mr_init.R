@@ -100,9 +100,9 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
     dir.create(mr$step.dir,recursive = TRUE)
   }
 
-  mr$regdb.out.dir = file.path(mr$project_dir, "metareg", metaid, "regdb")
-  if (!dir.exists(mr$regdb.out.dir)) {
-    dir.create(mr$regdb.out.dir,recursive = TRUE)
+  mr$repdb.out.dir = file.path(mr$project_dir, "metareg", metaid, "repdb")
+  if (!dir.exists(mr$repdb.out.dir)) {
+    dir.create(mr$repdb.out.dir,recursive = TRUE)
   }
 
   mr$step_run_fun = step_run_fun
@@ -120,7 +120,7 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
 
 
 
-  if (mr$opts$pass.regdb.info & NROW(mr$step.df)>0) {
+  if (mr$opts$pass.repdb.info & NROW(mr$step.df)>0) {
     mr = mr_load_parcels(mr, c("base_core","base_regvar",if (mr$opts$create.regxvar.cols) "base_regxvar"))
   }
 
@@ -135,16 +135,16 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
 #' @param extra.infeasible An alternative to extra.cache. If the R code in a modification step throws an error just generate a flag by storing a file in metareg/extra_infeasible. No cache will be generated. Yet, when running the whole project again, DAP will mark any extra infeasible step as infeasible and thus generate cache files. This approach will sometimes generate more efficient caches than extra.cache = TRUE, but takes longer since the complete repbox project must be run again. Best set either extra.cache=TRUE or extra.infeasible=TRUE.
 
 
-mr_opts = function(save.each.step = TRUE,extra.cache=TRUE,load.extra.cache=TRUE, extra.infeasible=FALSE, stop.on.error=FALSE, pass.regdb.info=TRUE, pass.internal.info = FALSE, regdb.tabs = c("reg","regvar","regxvar","regcoef","regcheck", "cmdpart","colstat_dummy","colstat_factor","colstat_numeric"), save.header=TRUE, stata.preserve.always=TRUE, create.regxvar.cols=pass.regdb.info,  ...) {
+mr_opts = function(save.each.step = TRUE,extra.cache=TRUE,load.extra.cache=TRUE, extra.infeasible=FALSE, stop.on.error=FALSE, pass.repdb.info=TRUE, pass.internal.info = FALSE, repdb.tabs = c("reg","regvar","regxvar","regcoef","regcheck", "cmdpart","colstat_dummy","colstat_factor","colstat_numeric"), save.header=TRUE, stata.preserve.always=TRUE, create.regxvar.cols=pass.repdb.info,  ...) {
   list(
     save.each.step = save.each.step,
     extra.cache = extra.cache,
     extra.infeasible = extra.infeasible,
     load.extra.cache = load.extra.cache,
     stop.on.error = stop.on.error,
-    pass.regdb.info = pass.regdb.info,
+    pass.repdb.info = pass.repdb.info,
     pass.internal.info = pass.internal.info,
-    regdb.tabs = regdb.tabs,
+    repdb.tabs = repdb.tabs,
     save.header = save.header,
     stata.preserve.always = stata.preserve.always,
     create.regxvar.cols=create.regxvar.cols,

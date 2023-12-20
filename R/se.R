@@ -1,12 +1,12 @@
 # Parses SE information from a Stata regression and
-# returns the relevenat SE info stored in the regdb reg table
+# returns the relevenat SE info stored in the repdb reg table
 
 get_se_parser_version = function() {
   return(0)
 }
 
-se_stata_to_regdb = function(cmd, opts_df = cmdpart_to_opts_df(cmdpart), cmdpart=NULL) {
-  restore.point("se_stata_to_regdb")
+se_stata_to_repdb = function(cmd, opts_df = cmdpart_to_opts_df(cmdpart), cmdpart=NULL) {
+  restore.point("se_stata_to_repdb")
 
   if (cmd == "newey") {
     row = opts_df$opt == "lag"
@@ -143,11 +143,11 @@ se_stata_to_regdb = function(cmd, opts_df = cmdpart_to_opts_df(cmdpart), cmdpart
   return(NULL)
 }
 
-regdb_parse_se_args = function(se_args, as_df=FALSE) {
-  restore.point("regdb_parse_se_args")
+repdb_parse_se_args = function(se_args, as_df=FALSE) {
+  restore.point("repdb_parse_se_args")
   #se_args = c("cluster1=i1;cluster2=i2","cluster2=i2")[1]
   if (length(se_args)>1) {
-    stop("regdb_se_args_to_list is not yet vectorized.")
+    stop("repdb_se_args_to_list is not yet vectorized.")
   }
 
   str = strsplit(se_args,";", fixed=TRUE)[[1]]

@@ -1,5 +1,5 @@
-mr_header_exists = function(project_dir, metaid, regdb.dir = file.path(project_dir,"metareg",metaid,"regdb")) {
-  header.file = paste0(regdb.dir,"/", metaid,"_header.Rds")
+mr_header_exists = function(project_dir, metaid, repdb.dir = file.path(project_dir,"metareg",metaid,"repdb")) {
+  header.file = paste0(repdb.dir,"/", metaid,"_header.Rds")
   file.exists(header.file)
 }
 
@@ -46,7 +46,7 @@ mr_save_header = function(mr) {
   if (is.null(header)) {
     cat("\nNo header was specified during the analysis. You should call mr_set_header in your study_agg_fun or stata_agg_fun. Every metastudy should create this header info which will be automatically saved. Only if you are VERY sure that you don't want to store header information, in mr_opts the argument save.header=FALSE. (But I don't know why you would want to do that).")
   }
-  saveRDS(list(header=header), file.path(mr$regdb.out.dir,paste0(header$metaid,"_header.Rds")))
+  saveRDS(list(header=header), file.path(mr$repdb.out.dir,paste0(header$metaid,"_header.Rds")))
 }
 
 
@@ -59,7 +59,7 @@ example = function() {
 mr_get_header_files = function(project.dirs, metaids) {
   restore.point("mr_get_header_files")
   grid = expand.grid(project_dir=project.dirs, metaid = metaids,stringsAsFactors = FALSE)
-  grid$parcel.dir = file.path(grid$project_dir,"metareg",grid$metaid,"regdb")
+  grid$parcel.dir = file.path(grid$project_dir,"metareg",grid$metaid,"repdb")
   paste0(grid$parcel.dir,"/",grid$metaid,"_header.Rds")
 
 }
@@ -85,12 +85,12 @@ example = function() {
 
 extract_header_from_parcel_and_save = function(project_dir, metaid, parcel, overwrite=FALSE) {
   restore.point("helper_extract_and_save_header")
-  parcel.file = file.path(project_dir, "metareg",metaid,"regdb",paste0(parcel,".Rds"))
+  parcel.file = file.path(project_dir, "metareg",metaid,"repdb",paste0(parcel,".Rds"))
   if (!file.exists(parcel.file)) {
     cat(parcel.file, " not found.\n")
     return()
   }
-  header.file = file.path(project_dir, "metareg",metaid,"regdb",paste0(metaid,"_header.Rds"))
+  header.file = file.path(project_dir, "metareg",metaid,"repdb",paste0(metaid,"_header.Rds"))
   if (file.exists(header.file) & !overwrite) return()
   li = readRDS(parcel.file)
   header = li$header

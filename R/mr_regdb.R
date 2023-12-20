@@ -26,7 +26,7 @@ example = function() {
   res = mr_base_aggregate_again(project_dir)
   agg = res$agg
 
-  ejd_to_regdb(project_dir)
+  ejd_to_repdb(project_dir)
 
 
   res$agg$same_df
@@ -41,8 +41,8 @@ example = function() {
 
 
 
-regdb_get_check_msg_from_header = function(header) {
-  restore.point("regdb_get_check_msg_from_header")
+repdb_get_check_msg_from_header = function(header) {
+  restore.point("repdb_get_check_msg_from_header")
   if (is.null(header)) return("")
   if (header$num_studied == 0) {
     return("No regression was analyzed.")
@@ -79,7 +79,7 @@ mr_load_parcels = function(mr, parcels, if.missing = c("stop","warn", "ignore")[
   restore.point("mr_load_parcels")
   parcel = parcels
   if (is.null(mr$parcel_list_df)) {
-    mr$parcel_list_df = regdb_list_project_parcels(mr$project_dir)
+    mr$parcel_list_df = repdb_list_project_parcels(mr$project_dir)
   }
   if (is.null(mr[["parcels"]])) {
     mr$parcels = list()
@@ -93,9 +93,9 @@ mr_load_parcels = function(mr, parcels, if.missing = c("stop","warn", "ignore")[
   rows = which(df$parcel == parcel)
   if (length(rows)==0) {
     if (if.missing=="stop") {
-      stop(paste0("The regdb file for parcel ", parcel, " was not created for project ", mr$project_dir))
+      stop(paste0("The repdb file for parcel ", parcel, " was not created for project ", mr$project_dir))
     } else if (if.missing=="warn") {
-      warning(paste0("The regdb file for parcel ", parcel, " was not created for project ", mr$project_dir))
+      warning(paste0("The repdb file for parcel ", parcel, " was not created for project ", mr$project_dir))
     }
     return(mr)
   }
@@ -138,7 +138,7 @@ mr_get_table = function(mr, table, parcel, steps=NULL, variant=NULL) {
   restore.point("mr_get_table")
 
   if (!parcel %in% names(mr$parcels)) {
-    stop("The regdb parcel ", parcel , " for table ", table, " is not loaded. Please make sure to first load it by calling\n\n mr = mr_load_parcel(mr, \"",parcel,"\")")
+    stop("The repdb parcel ", parcel , " for table ", table, " is not loaded. Please make sure to first load it by calling\n\n mr = mr_load_parcel(mr, \"",parcel,"\")")
   }
   df = mr$parcels[[parcel]][[table]]
   if (!is.null(variant)) {
@@ -155,7 +155,7 @@ mr_get_table = function(mr, table, parcel, steps=NULL, variant=NULL) {
 
 
 #' Helper function get the base regression specification for the specified step
-mr_get_reg = function(mr, step, allow.missing = !mr$opts$pass.regdb.info) {
+mr_get_reg = function(mr, step, allow.missing = !mr$opts$pass.repdb.info) {
   if (allow.missing) {
     if (!"base_core" %in% names(mr[["parcels"]])) {
       return(NULL)
@@ -165,13 +165,13 @@ mr_get_reg = function(mr, step, allow.missing = !mr$opts$pass.regdb.info) {
 }
 
 
-base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(file.path(project_dir, "metareg/base/agg.Rds")), regdb.dir = mr$regdb.out.dir) {
-  restore.point("ejd_to_regdb")
+base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(file.path(project_dir, "metareg/base/agg.Rds")), repdb.dir = mr$repdb.out.dir) {
+  restore.point("ejd_to_repdb")
 
   project = artid = basename(project_dir)
   parcels = list()
 
-  regdb.dir = mr$regdb.out.dir
+  repdb.dir = mr$repdb.out.dir
   #dap = readRDS(file.path(project_dir, "repbox/stata/dap.Rds"))
 
   step.df = mr$step.df
@@ -207,7 +207,7 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   stats = stats %>%
     join_coalesce(regs, by="step",c("nobs_org","iv_code","se_category","se_type","se_args","ncoef"))
 
-  fields = regdb_field_names("reg")
+  fields = repdb_field_names("reg")
   dat = reg_dat %>%
     left_join(select(step.df, step, runid),by="step") %>%
     left_join_overwrite(stats[,intersect(fields, names(stats))],by="step",yfields=fields)
@@ -220,16 +220,16 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
 
   dat$base_variant = "sb"
 
-  regdb_check_data(dat,"reg")
+  repdb_check_data(dat,"reg")
 
   parcels$base_core = list(reg=dat)
 
-  #regdb$reg = regdb_save_rds(dat,regdb.dir,"reg")
+  #repdb$reg = repdb_save_rds(dat,repdb.dir,"reg")
 
-  regdb_check_data(dat,"regsource")
+  repdb_check_data(dat,"regsource")
   parcels$base_regsource = list(regsource=dat)
 
-  #regdb_check_data(dat,"stepinfo")
+  #repdb_check_data(dat,"stepinfo")
   #parcels$base_core$stepinfo = dat
 
   # 1b) Save cmdpart #####################
@@ -241,26 +241,26 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   #cp.df$step = reg.df$step[cp.df$str_row]
   #cp.df$artid = project
 
-  regdb_check_data(cp.df,"cmdpart")
+  repdb_check_data(cp.df,"cmdpart")
   parcels$base_cmdpart = list(cmdpart = cp.df)
 
   # 1c) Save regcoef_diff_summary ####################
 
   dat = bind_rows(agg$diff_org_sum, agg$diff_r_sum)
-  regdb_check_data(dat,"regcoef_diff")
+  repdb_check_data(dat,"regcoef_diff")
 
   parcels$base_core$regcoef_diff = dat
 
 
   # 1d) Save header
-  regdb_check_data(agg$header,"header")
+  repdb_check_data(agg$header,"header")
   parcels$base_core$header = agg$header
 
 
   # 2. Save regcoef ######################
 
-  regdb_check_data(agg$stata_co,"regcoef")
-  regdb_check_data(agg$org_co,"regcoef")
+  repdb_check_data(agg$stata_co,"regcoef")
+  repdb_check_data(agg$org_co,"regcoef")
 
   parcels$base_regcoef = list(regcoef = agg$stata_co)
   parcels$org_regcoef = list(regcoef =c(agg$org_co))
@@ -269,7 +269,7 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
 
   # 3. a) Save regvar #######################
 
-  restore.point("ejd_to_regdb.3")
+  restore.point("ejd_to_repdb.3")
 
 
   colnames(agg$vi_df)
@@ -311,13 +311,13 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   vi = left_join_overwrite(vi, drop_df, by=c("step","cterm"))
   vi$is_dropped = is.true(vi$is_dropped) & vi$role %in% c("exo","endo")
 
-  regdb_check_data(vi,"regvar")
+  repdb_check_data(vi,"regvar")
 
   parcels$base_regvar = list(regvar = vi)
 
   # 3b) Save regxvar
 
-  regdb_check_data(agg$regxvar,"regxvar")
+  repdb_check_data(agg$regxvar,"regxvar")
 
   parcels$base_regxvar = list(regxvar = agg$regxvar)
 
@@ -332,7 +332,7 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
         variant = rep("sb",n()),
         cterm = col
       )
-    regdb_check_data(colstat,"colstat_numeric")
+    repdb_check_data(colstat,"colstat_numeric")
     parcels$base_colstat$colstat_numeric = colstat
   }
 
@@ -343,7 +343,7 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
         variant = rep("sb",n()),
         cterm = col
       )
-    regdb_check_data(colstat,"colstat_dummy")
+    repdb_check_data(colstat,"colstat_dummy")
     parcels$base_colstat$colstat_dummy = colstat
   }
   if (NROW(agg$colstat_factor)>0) {
@@ -353,7 +353,7 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
         variant = rep("sb",n()),
         cterm = col
       )
-    regdb_check_data(colstat,"colstat_factor")
+    repdb_check_data(colstat,"colstat_factor")
     parcels$base_colstat$colstat_factor = colstat
   }
 
@@ -363,13 +363,13 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
 
   er_df = bind_rows_with_parent_fields(agg$org_regs,"er", "step")
 
-  res = regdb_stats_to_regscalar_regstring(er_df, variant="sb", artid=artid)
+  res = repdb_stats_to_regscalar_regstring(er_df, variant="sb", artid=artid)
 
   parcels$base_regstring=list(regstring=res$regstring)
   parcels$base_regscalar=list(regscalar=res$regscalar)
 
   # 6. regcheck ######
-  regdb_check_data(agg$regcheck,"regcheck")
+  repdb_check_data(agg$regcheck,"regcheck")
   parcels$base_core$regcheck = agg$regcheck
 
   # 8. Store extra regressions ######
@@ -383,19 +383,19 @@ base_to_regdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
     base_extra_reg$regscalar = extra$regscalar %>% add_col(artid=artid)
     base_extra_reg$regmacro = extra$regmacro %>% add_col(artid=artid)
     parcels$base_extra_reg = base_extra_reg
-    regdb_check_data(base_extra_reg$regcoef, "regcoef")
+    repdb_check_data(base_extra_reg$regcoef, "regcoef")
   }
 
   # 7. Save parcels #####
 
-  regdb_save_parcels(parcels, regdb.dir, check=TRUE)
+  repdb_save_parcels(parcels, repdb.dir, check=TRUE)
   invisible(parcels)
 
 }
 
 
-regdb_stats_to_regscalar_regstring = function(stats, step=NULL, variant = NULL, artid=NULL, omit_strings = c("cmdline","cmd","depvar","variant","artid"), omit_scalars = NULL) {
-  restore.point("regdb_split_regscalar_regstring")
+repdb_stats_to_regscalar_regstring = function(stats, step=NULL, variant = NULL, artid=NULL, omit_strings = c("cmdline","cmd","depvar","variant","artid"), omit_scalars = NULL) {
+  restore.point("repdb_split_regscalar_regstring")
   stats = as_tibble(stats)
 
   cols = names(stats)
@@ -444,7 +444,7 @@ regdb_stats_to_regscalar_regstring = function(stats, step=NULL, variant = NULL, 
 
 }
 
-regdb_glance_to_reg_stats = function(glance) {
+repdb_glance_to_reg_stats = function(glance) {
   stats = glance %>%
     add_coalesce("r2",c("r.squared")) %>%
     add_coalesce("adj_r2",c("adj.r.squared")) %>%

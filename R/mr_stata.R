@@ -104,7 +104,7 @@ mr_make_all_stata_code = function(mr, stata_code_fun=mr$stata_code_fun, asteps =
   step = 4
   # Analysis code
   acode = sapply(asteps, function(step) {
-    if (mr$opts$pass.regdb.info) {
+    if (mr$opts$pass.repdb.info) {
       res = stata_code_fun(mr=mr, step=step, stata_code=step.df$stata_code[[step]], reg = mr_get_reg(mr, step))
     } else {
       res = stata_code_fun(mr=mr, step=step, stata_code=step.df$stata_code[[step]])

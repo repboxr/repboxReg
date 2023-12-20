@@ -384,7 +384,7 @@ mr_analysis_step = function(mr, astep, dat) {
     dat = mr_adapt_data_for_reg(mr$project_dir, astep, reg, org_dat,use.filter=FALSE)
   }
 
-  if (mr$opts$pass.regdb.info) {
+  if (mr$opts$pass.repdb.info) {
     # Create cterm cols: This also takes care about
     # abbreviations
     regvar = mr_get_base_table(mr, "regvar", astep)
@@ -399,7 +399,7 @@ mr_analysis_step = function(mr, astep, dat) {
   }
 
 
-  if (mr$opts$pass.regdb.info & !isTRUE(mr$opts$pass.internal.info)) {
+  if (mr$opts$pass.repdb.info & !isTRUE(mr$opts$pass.internal.info)) {
     reg = mr_get_reg(mr, step=astep)
   }
   mr = mr$step_run_fun(mr=mr, step=astep, dat=dat, reg=reg,   org_dat=org_dat, infeasible_filter=infeasible_filter)

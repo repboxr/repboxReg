@@ -118,7 +118,7 @@ vi.from.stata.reg = function(reg, dat) {
   # Add type of interaction effect
   vi = vi.add.ia.type(vi)
 
-  # Used by regdb and colstat
+  # Used by repdb and colstat
   vi = vi %>% mutate(
     var_org_type = varclass %>% change_val(c("fe","character"),"factor"),
     var_reg_type = class %>% change_val(c("fe","character"),"factor"),

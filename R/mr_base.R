@@ -1,4 +1,4 @@
-# Basic metareg run that generates basic entries into regdb database
+# Basic metareg run that generates basic entries into repdb database
 # Checks also if
 # orginal stata run and metareg stata run are identical
 # r implementation leads same / similar results as Stata run
@@ -21,7 +21,7 @@ example = function() {
   rstudioapi::filesPaneNavigate(project_dir)
 
   options(warn=2)
-  mr = mr_base_run_study(project_dir, stop.on.error = TRUE,create.regdb = TRUE)
+  mr = mr_base_run_study(project_dir, stop.on.error = TRUE,create.repdb = TRUE)
 
   step.df = mr$step.df
   regcheck = mr$results$agg$regcheck
@@ -31,7 +31,7 @@ example = function() {
 }
 
 
-mr_base_run_study = function(project_dir, run.stata=TRUE, astep = NULL, extra.cache=is.null(astep), stop.on.error = FALSE, create.regdb = TRUE, stata_version = NA) {
+mr_base_run_study = function(project_dir, run.stata=TRUE, astep = NULL, extra.cache=is.null(astep), stop.on.error = FALSE, create.repdb = TRUE, stata_version = NA) {
   restore.point("mr_base_run_study")
 
   #project_dir = file.path("~/repbox/projects_reg/testsupp")
@@ -47,7 +47,7 @@ mr_base_run_study = function(project_dir, run.stata=TRUE, astep = NULL, extra.ca
   step.df = dap$step.df
   #plot.dap(dap)
 
-  opts = mr_opts(load.extra.cache = extra.cache, extra.cache=extra.cache, stop.on.error = stop.on.error,pass.internal.info = TRUE, pass.regdb.info = FALSE, stata.preserve.always=TRUE)
+  opts = mr_opts(load.extra.cache = extra.cache, extra.cache=extra.cache, stop.on.error = stop.on.error,pass.internal.info = TRUE, pass.repdb.info = FALSE, stata.preserve.always=TRUE)
 
   mr = mr_init_study(project_dir,
     metaid="base", version=0,
@@ -62,7 +62,7 @@ mr_base_run_study = function(project_dir, run.stata=TRUE, astep = NULL, extra.ca
     return(mr_finish(mr))
   }
 
-  mr$create.regdb = create.regdb
+  mr$create.repdb = create.repdb
 
   if (is.null(astep)) {
     mr = mr_run(mr, run.stata = run.stata, clear.old.step.results = run.stata)
@@ -247,8 +247,8 @@ mr_base_study_agg_fun = function(mr, ...) {
 
   saveRDS(agg, file.path(mr$out.dir,"agg.Rds"))
 
-  if (mr$create.regdb) {
-    base_to_regdb(mr=mr, agg=agg)
+  if (mr$create.repdb) {
+    base_to_repdb(mr=mr, agg=agg)
   }
 
   mr
@@ -264,7 +264,7 @@ mr_base_step_run_fun =  function(mr,step, reg, dat, org_dat, infeasible_filter, 
   cmdpart$artid = mr$artid
 
   opts_df = cmdpart_to_opts_df(cmdpart)
-  se_info = se_stata_to_regdb(reg$cmd, opts_df)
+  se_info = se_stata_to_repdb(reg$cmd, opts_df)
   reg$cmdpart = list(cmdpart)
   reg$opts_df = list(opts_df)
 

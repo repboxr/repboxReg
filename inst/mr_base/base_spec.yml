@@ -1,12 +1,12 @@
 metaid: base
 
 descr: |
-  Base run that generates core information in regdb database
+  Base run that generates core information in repdb database
   and performs checks by comparing results from original run,
   base run and translation to R.
 
-# Parcels that contain data stored in regdb tables
-regdb_parcels:
+# Parcels that contain data stored in repdb tables
+repdb_parcels:
   base_core:
     descr: |
       Core information for base run.

@@ -138,7 +138,7 @@ parcels_to_tables = function(parcels, return_tab_df = FALSE) {
 
 load_parcels = function(project_dir, metaid, just_glob=NULL, ignore_glob="*_header.Rds", parcels=list()) {
   restore.point("load_parcels")
-  parcel.dirs = file.path(project_dir,"metareg", metaid, "regdb")
+  parcel.dirs = file.path(project_dir,"metareg", metaid, "repdb")
   parcel.files = list.files(parcel.dirs, glob2rx("*.Rds"), full.names = TRUE)
 
   bases = basename(parcel.files)
@@ -170,7 +170,7 @@ load_parcels = function(project_dir, metaid, just_glob=NULL, ignore_glob="*_head
 }
 
 load_parcel = function(project_dir, metaid, parcel) {
-  parcel.file=file.path(project_dir,"metareg", metaid,"regdb", paste0(parcel,".Rds"))
+  parcel.file=file.path(project_dir,"metareg", metaid,"repdb", paste0(parcel,".Rds"))
   if (!file.exists(parcel.file)) return(NULL)
   readRDS(parcel.file)
 }

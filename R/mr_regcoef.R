@@ -1,4 +1,4 @@
-# Helper function for regcoef (regdb table)
+# Helper function for regcoef (repdb table)
 
 parmest_output_to_regcoef = function(mr, variant,  prefix, artid = basename(mr$project_dir),missing.step = c("stop","ignore")[1]) {
   restore.point("parmest_output_to_regcoef")

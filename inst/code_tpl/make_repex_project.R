@@ -22,6 +22,6 @@ dap_and_cache_remove_from_project(project_dir)
 
 run.project.with.reg(project_dir)
 
-mr = mr_base_run_study(project_dir, stop.on.error = TRUE,create.regdb = TRUE)
+mr = mr_base_run_study(project_dir, stop.on.error = TRUE,create.repdb = TRUE)
 
 rstudioapi::filesPaneNavigate(project_dir)

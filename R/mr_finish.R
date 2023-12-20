@@ -20,7 +20,7 @@ mr_finish = function(mr, show_msg=TRUE, save_header = mr$opts$save.header) {
 
 
   if (show_msg) {
-    cat(paste0("\n",regdb_get_check_msg_from_header(header)),"\n")
+    cat(paste0("\n",repdb_get_check_msg_from_header(header)),"\n")
   }
 
   if (save_header) {
