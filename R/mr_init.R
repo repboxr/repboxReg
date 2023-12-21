@@ -100,7 +100,11 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
     dir.create(mr$step.dir,recursive = TRUE)
   }
 
-  mr$repdb.out.dir = file.path(mr$project_dir, "metareg", metaid, "repdb")
+  if (metaid!="base") {
+    mr$repdb.out.dir = file.path(mr$project_dir, "metareg", metaid, "repdb")
+  } else {
+    mr$repdb.out.dir = file.path(mr$project_dir, "repdb")
+  }
   if (!dir.exists(mr$repdb.out.dir)) {
     dir.create(mr$repdb.out.dir,recursive = TRUE)
   }
