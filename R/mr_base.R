@@ -245,7 +245,7 @@ mr_base_study_agg_fun = function(mr, ...) {
 
   mr = mr_set_result(mr, agg=agg)
 
-  saveRDS(agg, file.path(mr$out.dir,"agg.Rds"))
+  saveRDS(agg, file.path(mr$out_dir,"agg.Rds"))
 
   if (mr$create.repdb) {
     base_to_repdb(mr=mr, agg=agg)

@@ -24,7 +24,7 @@ example.metareg.stata = function() {
   agg.fun = function(mr, ...) {
     restore.point("agg.fun")
     stata.res = mr_agg_estout_tsv(mr,prefix = "reg_")
-    saveRDS(stata.res, file.path(mr$out.dir,"results.Rds"))
+    saveRDS(stata.res, file.path(mr$out_dir,"results.Rds"))
     stata.res
   }
 
@@ -45,7 +45,7 @@ example.metareg.stata = function() {
 mr_run_all_stata_code = function(mr, nostop = FALSE) {
   library(repboxStata)
   restore.point("mr_run_all_stata_code")
-  code.dir = first.non.null(mr$stata_code.dir, file.path(mr$out.dir,"stata_code"))
+  code.dir = first.non.null(mr$stata_code.dir, file.path(mr$out_dir,"stata_code"))
   do.files = list.files(code.dir, glob2rx("*.do"), full.names = TRUE)
   for (do.file in do.files) {
     #cat("\nRun", do.file,"\n")
@@ -123,7 +123,7 @@ mr_make_all_stata_code = function(mr, stata_code_fun=mr$stata_code_fun, asteps =
 
 
   # Make or clear path.code.dir
-  mr$stata_code.dir = path.code.dir = file.path(mr$out.dir,"stata_code")
+  mr$stata_code.dir = path.code.dir = file.path(mr$out_dir,"stata_code")
   if (!dir.exists(path.code.dir)) {
     dir.create(path.code.dir)
   } else {

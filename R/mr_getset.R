@@ -1,7 +1,7 @@
 
 mr_save_parcels = function(mr, parcels) {
   mr$saved_parcels = parcels
-  repdb_save_parcels(parcels, mr$repdb.out.dir)
+  repdb_save_parcels(parcels, mr$repdb_out_dir)
   mr
 }
 

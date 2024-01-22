@@ -1,0 +1,23 @@
+name: regtest
+
+descr: |
+  Results of post regression tests
+
+unique_index:
+  main_index: [artid, step, variant, testname]
+
+fields:
+  artid:
+
+  step:
+    type: int
+
+  variant:
+
+  testname:
+
+  statistic:
+
+  p:
+
+

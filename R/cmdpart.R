@@ -491,7 +491,7 @@ cmdparts_of_stata_reg = function(cmdlines) {
 
   restore.point("jslkfslfhksdfh")
 
-  opt_rows = which(df$part == "opt" & df$content %in% c("vce","robust","cluster"))
+  opt_rows = which(df$part == "opt" & df$content %in% c("vce","robust","cluster","r","ro","rob","robu","robus","cl","clu","clus","clust","cluste","cluster",""))
   df$tag[opt_rows] = "se"
 
   opt_str_rows = cmdpart_find_parent_rows(df, opt_rows)

@@ -79,7 +79,7 @@ mr_load_parcels = function(mr, parcels, if.missing = c("stop","warn", "ignore")[
   restore.point("mr_load_parcels")
   parcel = parcels
   if (is.null(mr$parcel_list_df)) {
-    mr$parcel_list_df = repdb_list_project_parcels(mr$project_dir)
+    mr$parcel_list_df = repdb_list_parcels(mr$project_dir)
   }
   if (is.null(mr[["parcels"]])) {
     mr$parcels = list()
@@ -165,13 +165,13 @@ mr_get_reg = function(mr, step, allow.missing = !mr$opts$pass.repdb.info) {
 }
 
 
-base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(file.path(project_dir, "metareg/base/agg.Rds")), repdb.dir = mr$repdb.out.dir) {
+base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(file.path(project_dir, "metareg/base/agg.Rds")), repdb.dir = mr$repdb_out_dir) {
   restore.point("ejd_to_repdb")
 
-  project = artid = basename(project_dir)
+  project = artid = .artid = basename(project_dir)
   parcels = list()
 
-  repdb.dir = mr$repdb.out.dir
+  repdb.dir = mr$repdb_out_dir
   #dap = readRDS(file.path(project_dir, "repbox/stata/dap.Rds"))
 
   step.df = mr$step.df
@@ -184,7 +184,7 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   regs = agg$regs
   reg_dat = agg$org_regs %>%
     mutate(
-      artid = artid,
+      artid = .artid,
       variant = "sb",
       lang = "stata",
       script_type = "do",

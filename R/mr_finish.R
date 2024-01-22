@@ -5,7 +5,7 @@ mr_finish = function(mr, show_msg=TRUE, save_header = mr$opts$save.header) {
   restore.point("mr_finish")
 
   if (mr_has_problem(mr)) {
-    problem.file = file.path(mr$out.dir,"problem.txt")
+    problem.file = file.path(mr$out_dir,"problem.txt")
     writeLines(problem.file, mr[["problem"]])
     return(mr)
   }

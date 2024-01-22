@@ -23,7 +23,7 @@ mr_aggregate_again = function(mr) {
   restore.point("mr_aggregate_again")
 
 
-  err.file = file.path(mr$out.dir, "has_error_aggregate_again.txt")
+  err.file = file.path(mr$out_dir, "has_error_aggregate_again.txt")
   writeLines(as.character(Sys.time()), err.file)
 
   if (!is.null(mr$stata_agg_fun)) {
@@ -66,16 +66,28 @@ mr_agg_df_rds = function(mr, glob="*.Rds", file_col = "result_file") {
   res
 }
 
-read_var_equal_val_file = function(file, as.numeric=FALSE) {
+read_var_equal_val_file = function(file, as.numeric=FALSE, wide = FALSE) {
+  restore.point("read_var_equal_file")
   txt = readLines(file)
   pos = stringi::stri_locate_first_fixed(txt,"=")[,1]
-  res = tibble(
-    var = stringi::stri_sub(txt,1,pos-1),
-    val = stringi::stri_sub(txt,pos+1)
-  )
+
+  var = stringi::stri_sub(txt,1,pos-1)
+  val = stringi::stri_sub(txt,pos+1)
   if (as.numeric) {
-    res$val = suppressWarnings(as.numeric(res$val))
+    val = suppressWarnings(as.numeric(val))
   }
+
+  if (wide) {
+    li = as.list(val)
+    names(li) = var
+    res = as_tibble(li)
+  } else {
+    res = tibble(
+      var = var,
+      val = val
+    )
+  }
+
   res
 }
 
@@ -144,8 +156,14 @@ mr_agg_stata_parmest = function(mr, file_prefix="reg_", missing.step="stop") {
     df = rename.cols(df, old.cols, new.cols)
     df = df[,intersect(new.cols, colnames(df))]
     if (!is.null(df)) {
-      step = as.integer(str.between(file, file_prefix, "__"))
-      variant = str.between(file, "__", ".dta")
+      has.variant = has.substr(file,"__")
+      if (has.variant) {
+        step = as.integer(str.between(file, file_prefix, "__"))
+        variant = str.between(file, "__", ".dta")
+      } else {
+        step = as.integer(str.between(file, file_prefix, ".dta"))
+        variant = ""
+      }
       df$step = rep(step, NROW(step))
       df$variant = rep(variant, NROW(step))
       df$cmd = step.df$cmd[step]

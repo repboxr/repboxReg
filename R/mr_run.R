@@ -20,7 +20,7 @@ mr_get_asteps = function(mr, just_used=TRUE) {
 }
 
 mr_init_log = function(mr) {
-  log.dir = file.path(mr$out.dir,"logs")
+  log.dir = file.path(mr$out_dir,"logs")
   if (!dir.exists(log.dir)) dir.create(log.dir)
   log.file = paste0(log.dir,"/log_",gsub(":","", Sys.time(), fixed=TRUE),".txt")
   options(metareg_log_file = log.file)
@@ -87,7 +87,7 @@ mr_run = function(mr, asteps = mr_get_asteps(mr), run.stata=TRUE, clear.old.step
   if (!is.null(mr$stata_agg_fun)) {
     start = as.numeric(Sys.time())
     mr = mr$stata_agg_fun(mr, stata_check_df = mr[["stata_check_df"]])
-    check_mr_class(mr)
+    check_mr_class(mr,"stata_agg_fun")
 
     mr$stata_agg_runtime = as.numeric(Sys.time())-as.numeric(start)
   }
@@ -120,7 +120,7 @@ mr_run = function(mr, asteps = mr_get_asteps(mr), run.stata=TRUE, clear.old.step
   if (do.agg) {
     start = as.numeric(Sys.time())
     mr = mr$study_agg_fun(mr)
-    check_mr_class(mr)
+    check_mr_class(mr,"study_agg_fun")
     mr$agg_runtime = as.numeric(Sys.time())-as.numeric(start)
   }
 
@@ -138,7 +138,7 @@ mr_store_runtime = function(mr, save = TRUE) {
     steps_runtime = transmute(mr$step.df, step=step, action=ifelse(cache,"load",step_type), r_runtime=runtime) %>% filter(!is.na(r_runtime))
   )
   if (save) {
-    saveRDS(rt,paste0(mr$out.dir,"/runtimes.Rds"))
+    saveRDS(rt,paste0(mr$out_dir,"/runtimes.Rds"))
   }
   mr$runtimes = rt
   mr
@@ -375,7 +375,7 @@ mr_analysis_step = function(mr, astep, dat) {
 
   if (mr_is_infeasible(dat)) {
     res  = dat
-    save.dir = file.path(mr$out.dir,"step_results")
+    save.dir = file.path(mr$out_dir,"step_results")
     save.file = paste0(save.dir,"/infeasible_", astep,".Rds")
     saveRDS(res, save.file)
 
@@ -403,7 +403,7 @@ mr_analysis_step = function(mr, astep, dat) {
     reg = mr_get_reg(mr, step=astep)
   }
   mr = mr$step_run_fun(mr=mr, step=astep, dat=dat, reg=reg,   org_dat=org_dat, infeasible_filter=infeasible_filter)
-  check_mr_class(mr)
+  check_mr_class(mr,"step_run_fun")
 
 
 
@@ -699,9 +699,15 @@ add_cols_if_not_exist = function(df, ...) {
   df
 }
 
-check_mr_class = function(mr) {
+check_mr_class = function(mr, fun=NULL) {
   if (!is(mr, "metareg_study")) {
-    stop("The mr object has not the correct class. Please make sure that your custom functions: step_run_fun, study_agg_fun and stastata_agg_fun always return the mr object passed as first argument. (The mr object may be possibly modified inside the function, e.g. by calling mr_set_result).")
+    if (!is.null(fun)) {
+      stop(paste0("Your custom function for ", fun, " did not return a proper mr object. Please make sure that it always returns the mr object, whih is passed as first argument. The mr object may be possibly modified inside the function, e.g. by calling mr_set_result."))
+    } else {
+      stop("One of your custom functions did not return a proper mr object. Please make sure that your custom functions: step_run_fun, study_agg_fun and stata_agg_fun always return the mr object, whih is passed as first argument. The mr object may be possibly modified inside the function, e.g. by calling mr_set_result.")
+
+    }
+
   }
 }
 

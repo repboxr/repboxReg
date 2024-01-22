@@ -46,7 +46,7 @@ mr_save_header = function(mr) {
   if (is.null(header)) {
     cat("\nNo header was specified during the analysis. You should call mr_set_header in your study_agg_fun or stata_agg_fun. Every metastudy should create this header info which will be automatically saved. Only if you are VERY sure that you don't want to store header information, in mr_opts the argument save.header=FALSE. (But I don't know why you would want to do that).")
   }
-  saveRDS(list(header=header), file.path(mr$repdb.out.dir,paste0(header$metaid,"_header.Rds")))
+  saveRDS(list(header=header), file.path(mr$repdb_out_dir,paste0(header$metaid,"_header.Rds")))
 }
 
 

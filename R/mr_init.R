@@ -38,7 +38,7 @@ example = function() {
   }
   mr = mr_init_study(project_dir,metaid="HC", fun=ana.fun, dap=dap)
 
-  mr_write_path_rcode(mr, code.file = file.path(mr$out.dir,"path_code.R"),add.line.info = TRUE)
+  mr_write_path_rcode(mr, code.file = file.path(mr$out_dir,"path_code.R"),add.line.info = TRUE)
   mr_run(mr, asteps = sample(mr_get_asteps(mr),2))
   mr_run(mr)
   res = mr_run_single_path(mr, 42)
@@ -91,9 +91,9 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
   } else {
     mr$project.type = "metareg"
   }
-  mr$out.dir = file.path(mr$project_dir, "metareg", metaid)
-  if (!dir.exists(mr$out.dir)) {
-    dir.create(mr$out.dir,recursive = TRUE)
+  mr$out_dir = file.path(mr$project_dir, "metareg", metaid)
+  if (!dir.exists(mr$out_dir)) {
+    dir.create(mr$out_dir,recursive = TRUE)
   }
   mr$step.dir = file.path(mr$project_dir, "metareg", metaid, "step_results")
   if (!dir.exists(mr$step.dir)) {
@@ -101,12 +101,12 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
   }
 
   if (metaid!="base") {
-    mr$repdb.out.dir = file.path(mr$project_dir, "metareg", metaid, "repdb")
+    mr$repdb_out_dir = file.path(mr$project_dir, "metareg", metaid, "repdb")
   } else {
-    mr$repdb.out.dir = file.path(mr$project_dir, "repdb")
+    mr$repdb_out_dir = file.path(mr$project_dir, "repdb")
   }
-  if (!dir.exists(mr$repdb.out.dir)) {
-    dir.create(mr$repdb.out.dir,recursive = TRUE)
+  if (!dir.exists(mr$repdb_out_dir)) {
+    dir.create(mr$repdb_out_dir,recursive = TRUE)
   }
 
   mr$step_run_fun = step_run_fun
