@@ -527,7 +527,7 @@ cmdpart_parse_stata_opt_str = function(str) {
 
   all_opt_str = all_opt = all_opt_arg = vector("list",NROW(str))
 
-  i = 3
+  i = 1
   for (i in seq_along(str)) {
     s = str[i]
     # 1. Find 1st level braces and replace with ph
@@ -535,8 +535,8 @@ cmdpart_parse_stata_opt_str = function(str) {
 
     if (NROW(brace_pos)==0) {
       s = shorten.spaces(s) %>% trimws()
-      all_opt[[i]] = strsplit(s, " ", fixed=TRUE)
-      all_opt_str[[i]] = paste0("{{opt,", seq_along(all_opt[[i]]),"}}")
+      all_opt[[i]] = strsplit(s, " ", fixed=TRUE)[[1]]
+      all_opt_str[[i]] = paste0("{{opt", seq_along(all_opt[[i]]),"}}")
       all_opt_arg[[i]] = rep(NA, length(all_opt[[i]]))
       next
     }
@@ -593,11 +593,18 @@ cmdpart_get_placeholders = function(cp_df, prefix="{{", postfix="}}") {
 }
 
 cmdpart_create_cmdline = function(cp_df) {
+
   main_row = which(cp_df$part == "main")
   str = cp_df$content[main_row]
   ph = cmdpart_get_placeholders(cp_df)
 
+  # while(TRUE) {
+  #   str_n = stri_replace_all_fixed(str, ph, cp_df$content, vectorize_all = FALSE)
+  #   if (str_n == str) break
+  #   str = str_n
+  # }
   stri_replace_all_fixed(str, ph, cp_df$content, vectorize_all = FALSE)
+
 }
 
 cmdpart_find_parent_rows = function(df, rows=seq_along(NROW(df)), remove.na=FALSE) {
