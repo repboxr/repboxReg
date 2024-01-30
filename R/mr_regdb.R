@@ -120,9 +120,9 @@ mr_load_parcels = function(mr, parcels, if.missing = c("stop","warn", "ignore")[
 
 mr_base_table_parcel = function(table) {
   if (table %in% c("header", "reg", "regcheck", "regcoef_diff")) {
-    return("base_core")
+    return("reg_core")
   } else if (table %in% c("colstat_dummy", "colstat_factor", "colstat_numeric")) {
-    return("base_colstat")
+    return("colstat")
   } else {
     return(paste0("base_", table))
   }
@@ -157,11 +157,11 @@ mr_get_table = function(mr, table, parcel, steps=NULL, variant=NULL) {
 #' Helper function get the base regression specification for the specified step
 mr_get_reg = function(mr, step, allow.missing = !mr$opts$pass.repdb.info) {
   if (allow.missing) {
-    if (!"base_core" %in% names(mr[["parcels"]])) {
+    if (!"reg_core" %in% names(mr[["parcels"]])) {
       return(NULL)
     }
   }
-  return(mr_get_table(mr, "reg","base_core", step))
+  return(mr_get_table(mr, "reg","reg_core", step))
 }
 
 
@@ -222,15 +222,15 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
 
   repdb_check_data(dat,"reg")
 
-  parcels$base_core = list(reg=dat)
+  parcels$reg_core = list(reg=dat)
 
   #repdb$reg = repdb_save_rds(dat,repdb.dir,"reg")
 
   repdb_check_data(dat,"regsource")
-  parcels$base_regsource = list(regsource=dat)
+  parcels$regsource = list(regsource=dat)
 
   #repdb_check_data(dat,"stepinfo")
-  #parcels$base_core$stepinfo = dat
+  #parcels$reg_core$stepinfo = dat
 
   # 1b) Save cmdpart #####################
 
@@ -242,19 +242,19 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   #cp.df$artid = project
 
   repdb_check_data(cp.df,"cmdpart")
-  parcels$base_cmdpart = list(cmdpart = cp.df)
+  parcels$cmdpart = list(cmdpart = cp.df)
 
   # 1c) Save regcoef_diff_summary ####################
 
   dat = bind_rows(agg$diff_org_sum, agg$diff_r_sum)
   repdb_check_data(dat,"regcoef_diff")
 
-  parcels$base_core$regcoef_diff = dat
+  parcels$reg_core$regcoef_diff = dat
 
 
   # 1d) Save header
   repdb_check_data(agg$header,"header")
-  parcels$base_core$header = agg$header
+  parcels$reg_core$header = agg$header
 
 
   # 2. Save regcoef ######################
@@ -262,7 +262,7 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   repdb_check_data(agg$stata_co,"regcoef")
   repdb_check_data(agg$org_co,"regcoef")
 
-  parcels$base_regcoef = list(regcoef = agg$stata_co)
+  parcels$regcoef = list(regcoef = agg$stata_co)
   parcels$org_regcoef = list(regcoef =c(agg$org_co))
 
   regcoef = agg$stata_co
@@ -313,18 +313,18 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
 
   repdb_check_data(vi,"regvar")
 
-  parcels$base_regvar = list(regvar = vi)
+  parcels$regvar = list(regvar = vi)
 
   # 3b) Save regxvar
 
   repdb_check_data(agg$regxvar,"regxvar")
 
-  parcels$base_regxvar = list(regxvar = agg$regxvar)
+  parcels$regxvar = list(regxvar = agg$regxvar)
 
 
   # 4. Save colstat ##############
 
-  parcels$base_colstat = list()
+  parcels$colstat = list()
   if (NROW(agg$colstat_numeric)>0) {
     colstat = agg$colstat_numeric %>%
       mutate(
@@ -333,7 +333,7 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
         cterm = col
       )
     repdb_check_data(colstat,"colstat_numeric")
-    parcels$base_colstat$colstat_numeric = colstat
+    parcels$colstat$colstat_numeric = colstat
   }
 
   if (NROW(agg$colstat_dummy)>0) {
@@ -344,7 +344,7 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
         cterm = col
       )
     repdb_check_data(colstat,"colstat_dummy")
-    parcels$base_colstat$colstat_dummy = colstat
+    parcels$colstat$colstat_dummy = colstat
   }
   if (NROW(agg$colstat_factor)>0) {
     colstat = agg$colstat_factor %>%
@@ -354,7 +354,7 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
         cterm = col
       )
     repdb_check_data(colstat,"colstat_factor")
-    parcels$base_colstat$colstat_factor = colstat
+    parcels$colstat$colstat_factor = colstat
   }
 
   # 5. regscalar and regstring #####
@@ -365,12 +365,12 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
 
   res = repdb_stats_to_regscalar_regstring(er_df, variant="sb", artid=artid)
 
-  parcels$base_regstring=list(regstring=res$regstring)
-  parcels$base_regscalar=list(regscalar=res$regscalar)
+  parcels$regstring=list(regstring=res$regstring)
+  parcels$regscalar=list(regscalar=res$regscalar)
 
   # 6. regcheck ######
   repdb_check_data(agg$regcheck,"regcheck")
-  parcels$base_core$regcheck = agg$regcheck
+  parcels$reg_core$regcheck = agg$regcheck
 
   # 8. Store extra regressions ######
   #    These are e.g. marginal effects.

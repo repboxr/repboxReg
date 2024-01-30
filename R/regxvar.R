@@ -16,8 +16,8 @@ example = function() {
   org_dat = dat
   dat = mr_adapt_data_for_reg(project_dir, step, internal_reg, dat)
 
-  regvar = load_parcel(project_dir, "base","base_regvar")$regvar %>% filter(step==5)
-  regcoef = load_parcel(project_dir, "base","base_regcoef")$regcoef %>% filter(step==5)
+  regvar = load_parcel(project_dir, "base","regvar")$regvar %>% filter(step==5)
+  regcoef = load_parcel(project_dir, "base","regcoef")$regcoef %>% filter(step==5)
 
   regxvar = make_regxvar(regvar, dat, regcoef)
   regxvar

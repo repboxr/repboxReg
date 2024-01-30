@@ -640,7 +640,7 @@ cmdpart_find_child_rows = function(df, rows=seq_along(NROW(df)), child_part) {
 
 
 example = function() {
-  cmdpart = readRDS("C:/libraries/repbox/projects_reg/testsupp/repdb/base_cmdpart.Rds")$cmdpart
+  cmdpart = readRDS("C:/libraries/repbox/projects_reg/testsupp/repdb/cmdpart.Rds")$cmdpart
   cmdpart_to_opts_df(cmdpart)
 }
 

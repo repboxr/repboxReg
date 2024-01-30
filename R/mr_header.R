@@ -77,7 +77,7 @@ example = function() {
   project.dirs = list.files("~/repbox/projects_reg",full.names = TRUE)
   project_dir = "/home/rstudio/repbox/projects_reg/testsupp"
   for (project_dir in project.dirs) {
-    extract_header_from_parcel_and_save(project_dir, "base","base_core", overwrite=TRUE)
+    extract_header_from_parcel_and_save(project_dir, "base","reg_core", overwrite=TRUE)
   }
 }
 

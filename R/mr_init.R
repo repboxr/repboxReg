@@ -125,7 +125,7 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
 
 
   if (mr$opts$pass.repdb.info & NROW(mr$step.df)>0) {
-    mr = mr_load_parcels(mr, c("base_core","base_regvar",if (mr$opts$create.regxvar.cols) "base_regxvar"))
+    mr = mr_load_parcels(mr, c("reg_core","regvar",if (mr$opts$create.regxvar.cols) "regxvar"))
   }
 
 
