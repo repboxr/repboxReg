@@ -43,7 +43,7 @@ mr_cat = function(..., just.log=FALSE) {
   cat(paste0(Sys.time(),": ", msg),file = log.file, append=TRUE)
 }
 
-mr_run = function(mr, asteps = mr_get_asteps(mr), run.stata=TRUE, clear.old.step.results = TRUE, do.agg = TRUE, stop.on.error = mr$opts$stop.on.error) {
+mr_run = function(mr, asteps = mr_get_asteps(mr), run_stata=TRUE, clear_old_step_results = TRUE, do_agg = !is.null(mr$study_agg_fun), stop.on.error = mr$opts$stop.on.error) {
   restore.point("mr_run")
   repbox_reset_problem_log("run")
 
@@ -69,13 +69,13 @@ mr_run = function(mr, asteps = mr_get_asteps(mr), run.stata=TRUE, clear.old.step
   mr$step.df$runtime = NA
 
   mr$stata_runtime = mr$r_runtime = mr$agg_runtime = mr$stata_agg_runtime = NA
-  if (clear.old.step.results & !is.null(mr$step.dir)) {
+  if (clear_old_step_results & !is.null(mr$step.dir)) {
     del.files = list.files(mr$step.dir, full.names = TRUE)
     file.remove(del.files)
   }
 
   # 0. Run stata code
-  if (run.stata & !is.null(mr$stata_code_fun)) {
+  if (run_stata & !is.null(mr$stata_code_fun)) {
     mr = mr_make_all_stata_code(mr, mr$stata_code_fun, asteps = asteps)
     start = Sys.time()
     mr = mr_run_all_stata_code(mr)
@@ -117,7 +117,7 @@ mr_run = function(mr, asteps = mr_get_asteps(mr), run.stata=TRUE, clear.old.step
   }
   mr$r_runtime = as.numeric(Sys.time())-as.numeric(start)
 
-  if (do.agg) {
+  if (do_agg) {
     start = as.numeric(Sys.time())
     mr = mr$study_agg_fun(mr)
     check_mr_class(mr,"study_agg_fun")

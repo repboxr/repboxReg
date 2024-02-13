@@ -1,5 +1,27 @@
 # Some metareg helper functions
 
+# Loads the data set for a particular regression
+# This is not the most efficient way to run a meta study with several
+# regressions in an article, but should rather be used if for testing
+# purposes you want to first examine a particular regression.
+mr_load_reg_data = function(project_dir, step) {
+  restore.point("mr_load_reg_data")
+  #project_dir = "~/repbox/projects_gha/aejapp_3_4_9"
+  #step = 4
+
+  step_fun = function(mr,...) {
+    args = list(...)
+    restore.point("step_fun")
+    mr$my.results = args
+    mr
+  }
+
+  mr = mr_init_study(project_dir,metaid = "temp",version = 0,step_run_fun = step_fun)
+  mr = mr_run(mr, asteps=step,run_stata = FALSE, do_agg=FALSE)
+  my.results = mr$my.results
+  mr$my.results = NULL
+  c(list(mr=mr), my.results)
+}
 
 mr_base_variant = function(mr) {
   mr$repdb$reg

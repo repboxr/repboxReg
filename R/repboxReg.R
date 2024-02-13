@@ -92,7 +92,7 @@ create.repbox.reg.project.from.ejd = function(project=NULL) {
   run.project.with.reg(project_dir,overwrite.dap = TRUE, make.dap = TRUE)
   writeLines("yes",paste0(project_dir,"/repbox/metareg_was_run.txt"))
 
-  mr = mr_base_run_study(project_dir, run.stata=TRUE)
+  mr = mr_base_run_study(project_dir, run_stata=TRUE)
 
   if (FALSE) {
     plot.dap(mr)

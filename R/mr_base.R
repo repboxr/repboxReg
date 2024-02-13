@@ -31,7 +31,7 @@ example = function() {
 }
 
 
-mr_base_run_study = function(project_dir, run.stata=TRUE, astep = NULL, extra.cache=is.null(astep), stop.on.error = FALSE, create.repdb = TRUE, stata_version = NA) {
+mr_base_run_study = function(project_dir, run_stata=TRUE, astep = NULL, extra.cache=is.null(astep), stop.on.error = FALSE, create.repdb = TRUE, stata_version = NA) {
   restore.point("mr_base_run_study")
 
   #project_dir = file.path("~/repbox/projects_reg/testsupp")
@@ -65,15 +65,15 @@ mr_base_run_study = function(project_dir, run.stata=TRUE, astep = NULL, extra.ca
   mr$create.repdb = create.repdb
 
   if (is.null(astep)) {
-    mr = mr_run(mr, run.stata = run.stata, clear.old.step.results = run.stata)
+    mr = mr_run(mr, run_stata = run_stata, clear_old_step_results = run_stata)
   } else {
-    mr = mr_run(mr, run.stata = run.stata, clear.old.step.results = FALSE,asteps = astep)
+    mr = mr_run(mr, run_stata = run_stata, clear_old_step_results = FALSE,asteps = astep)
   }
 
 
   agg = mr_get_result(mr, "agg")
-  if (!(run.stata) & NROW(agg$stata_ct)==0) {
-    cat("\n\nWARNING: You have set run.stata = FALSE but no previous Stata results existed.\n")
+  if (!(run_stata) & NROW(agg$stata_ct)==0) {
+    cat("\n\nWARNING: You have set run_stata = FALSE but no previous Stata results existed.\n")
   }
 
 

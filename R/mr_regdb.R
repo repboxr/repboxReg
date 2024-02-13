@@ -124,7 +124,7 @@ mr_base_table_parcel = function(table) {
   } else if (table %in% c("colstat_dummy", "colstat_factor", "colstat_numeric")) {
     return("colstat")
   } else {
-    return(paste0("base_", table))
+    return(table)
   }
 }
 
