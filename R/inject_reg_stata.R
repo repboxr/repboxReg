@@ -10,14 +10,12 @@ injection.reg = function(txt, lines=seq_along(txt),do, opts=rbs.opts()) {
 
   res.files = paste0(res.dir,"/",do$donum,"_",  lines,"_`repbox_local_cmd_count'",".dta")
 
-  reset.datasig = report.datasig = FALSE
-
 paste0('
 ', end.injection(do$donum, lines, "RUNCMD",do),'
 * REGRESSION INJECTION START
 parmest, label saving("', res.files,'", replace)
 
-',post.injection(txt,lines,do=do,reset.datasig=reset.datasig,  report.datasig = report.datasig, report.xtset=TRUE),'
+',post.injection(txt,lines,do=do, report.xtset=TRUE),'
 display "#~# INJECT REG_ERETURN ', do$donum,' ', lines,' `repbox_local_cmd_count\'"
 ereturn list
 display "#~# END INJECT REG_ERETURN ',do$donum,' ', lines,' `repbox_local_cmd_count\'"
@@ -38,13 +36,11 @@ injection.reg.old = function(txt, lines=seq_along(txt),do, opts=rbs.opts()) {
 
   tsv.files = paste0(tsv.dir,"/",do$donum,"_",  lines,"_`repbox_local_cmd_count'",".tsv")
 
-  reset.datasig = report.datasig = FALSE
-
   paste0('
 ', end.injection(do$donum, lines, "RUNCMD",do),'
 * REGRESSION INJECTION START
 capture noisily estout . using "',tsv.files,'", cells("b se t p ci_l ci_u") replace
-',post.injection(txt,lines,do=do,reset.datasig=reset.datasig,  report.datasig = report.datasig, report.xtset=TRUE),'
+',post.injection(txt,lines,do=do, report.xtset=TRUE),'
 display "#~# INJECT REG_ERETURN ', do$donum,' ', lines,' `repbox_local_cmd_count\'"
 ereturn list
 display "#~# END INJECT REG_ERETURN ',do$donum,' ', lines,' `repbox_local_cmd_count\'"
