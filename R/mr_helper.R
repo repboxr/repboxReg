@@ -38,15 +38,19 @@ mr_uses_no_reg = function(mr) {
 #'    has columns "step" and a logical column "use_step".
 #'    Such a data frame will typically be a
 #'    mutated version of reg_df where the colum "use_reg" is added.
-mr_specify_used_reg = function(mr, reg_df) {
+mr_specify_used_reg = function(mr, reg_df, use_reg = suppressWarnings(reg_df$use_reg)) {
   if (NROW(reg_df)==0) {
     mr$used_steps = integer(0)
     return(mr)
   }
-  if (!all(c("step","use_reg") %in% names(reg_df))) {
-    stop("If you provide a data frame it must have the columns 'step' and 'use_reg' (TRUE / FALSE).")
+  if (!all(c("step") %in% names(reg_df))) {
+    stop("If you provide a data frame it must have the columns 'step' (TRUE / FALSE).")
   }
-  mr$used_steps = reg_df$step[reg_df$use_reg]
+  if (!is.null(use_reg)) {
+    mr$used_steps = reg_df$step[reg_df$use_reg]
+  } else {
+    mr$used_steps = reg_df$step
+  }
   mr
 }
 

@@ -37,7 +37,7 @@ fields:
   basevar:
     descr: |
       Original variable in the data set from which this variable is computed from, e.g. if
-      if we use Stata code to generate a lag variable, then it is the original variable name.
+      if we use Stata code to generate a lag variable then it is the original variable name.
 
   role:
     descr: Role of the variable in the regression
