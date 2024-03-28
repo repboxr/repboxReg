@@ -38,7 +38,12 @@ vi.from.stata.reg = function(reg, dat) {
   # Add absorb(var) option from areg
   if (reg$cmd %in% c("areg","reghdfe")) {
     opts.df = reg$opts.df[[1]]
-    row = which(opts.df$opt=="absorb")
+    # Update "a" is an abbreviation for absorb
+    if (reg$cmd == "areg") {
+      row = which(opts.df$opt %in% c("absorb","a","ab"))
+    } else {
+      row = which(opts.df$opt=="absorb")
+    }
     if (length(row)>0) {
       vars = opts.df$opt_args[row[1]] %>% shorten.spaces() %>% strsplit(" ", fixed=TRUE)
       vars = vars[[1]]
