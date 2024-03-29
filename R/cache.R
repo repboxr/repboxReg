@@ -25,6 +25,13 @@ dap_and_cache_check_outdated = function(project_dir, sup.dir = file.path(project
   cache.min.time = suppressWarnings(min(file.mtime(cache.files)))
 
   if (isTRUE(do.max.time > dap.time)) {
+    # Only show warning since sometimes file stamps
+    # seem to act weird...
+    warning("In your org folder a do seem file newer than the DAP. Probably, you should re-run the initial reproduction before performing regression analysis.")
+    return(list(ok=TRUE, msg="In your org folder, a do file seems to be newer than the DAP. Probably, you should re-run the initial reproduction before performing regression analysis."))
+  }
+
+  if (isTRUE(do.max.time > dap.time)) {
     return(list(ok=FALSE, msg="There is a do file newer than the DAP. Please clear DAP and cache and run all new: 1. repox without reg (to create run.df), 2. repbox with reg (to create DAP and caches) 3. Your metastudy"))
   }
   if (isTRUE(cache.min.time < dap.time)) {
