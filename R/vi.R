@@ -91,6 +91,14 @@ vi.from.stata.reg = function(reg, dat) {
       prefix = str.left.of(var_expr,".",not.found = rep("", n())),
       var = str.right.of(var_expr,"."),
     ) %>%
+    mutate(
+      prefix = case_when(
+        # Transforms e.g. ib2005.year into equivalent code b2005.year
+        # to always have a single digit prefix type
+        startsWith(tolower(prefix),"ib") ~ paste0("b", substring(prefix,3)),
+        TRUE ~ prefix
+      )
+    ) %>%
     left_join(cols_info, by=c("var"="col")) %>%
     mutate(
       is_factor = class %in% c("character","factor"),
