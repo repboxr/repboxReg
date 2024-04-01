@@ -22,13 +22,26 @@ stata_expr_to_cterm = function(stata_expr) {
   restore.point("stata_expr_to_cterm")
   cterm = stringi::stri_replace_all_regex(stata_expr,"(#+)|(\\|)|(\\*)","#")
   cterm = gsub(" ","", cterm)
-  # remove i. in the beginning of a variable name
-  cterm = gsub("#i\\.","#", cterm, ignore.case=TRUE)
-  cterm = gsub("^i\\.","", cterm, ignore.case=TRUE)
-  cterm = gsub("#c\\.","#", cterm, ignore.case=TRUE)
-  cterm = gsub("^c\\.","", cterm, ignore.case=TRUE)
-  cterm = gsub(".","@", cterm, fixed=TRUE)
 
+  # i2000.year => year=2000
+  # generates a full dummy set
+  #cterm = "b1990.x##I2000.year"
+  cterm = stringi::stri_replace_all_regex(cterm, "(#|^)[iI]([a-zA-z0-9_]+)\\.([a-zA-Z_0-9]+)","$3=$2" )
+
+  # i.year => year
+  # c.year => year
+  cterm = gsub("#[ic]\\.","#", cterm, ignore.case=TRUE)
+  cterm = gsub("^[ic]\\.","", cterm, ignore.case=TRUE)
+
+  # b2000.year => year
+  # will generate full dummy set with reference level 2000
+  cterm = stringi::stri_replace_all_regex(cterm, "#[bB]([a-zA-z0-9_]+)\\.","" )
+  cterm = stringi::stri_replace_all_regex(cterm, "^[bB]([a-zA-z0-9_]+)\\.","" )
+
+  # L1.year => L1@year
+
+  # remove i. in the beginning of a variable name
+  cterm = gsub(".","@", cterm, fixed=TRUE)
   cterm
 }
 

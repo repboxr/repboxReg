@@ -120,6 +120,10 @@ vi.from.stata.reg = function(reg, dat) {
   vi$cterm = stata_expr_to_cterm(vi$var_expr)
   vi$basevar = stata_expr_to_cterm(vi$var)
 
+  # Deals with specifications like
+  # i2005.year which has cterm: year=2005
+  vi$class = ifelse(has.substr(vi$cterm,"="),"dummy",vi$class)
+
   # Add type of interaction effect
   vi = vi.add.ia.type(vi)
 
@@ -135,6 +139,7 @@ vi.from.stata.reg = function(reg, dat) {
       var_reg_type = ifelse(role=="cluster", "factor", var_reg_type),
       ia_reg_type = ifelse(role=="cluster", "factor", ia_reg_type)
     )
+
   #vi$omit = tolower(vi$prefix) == "o"
   vi
 }
