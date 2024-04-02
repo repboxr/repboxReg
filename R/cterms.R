@@ -26,7 +26,7 @@ stata_expr_to_cterm = function(stata_expr) {
   # i2000.year => year=2000
   # generates a full dummy set. Not only numeric values allowed.
   #cterm = "b1990.x##I2000.year"
-  cterm = stringi::stri_replace_all_regex(cterm, "(#|^)[iI]([0-9]+)\\.([a-zA-Z_0-9]+)","$3=$2" )
+  cterm = stringi::stri_replace_all_regex(cterm, "(#|^)[iI]([0-9]+)\\.([a-zA-Z_0-9]+)","$1$3=$2" )
 
   # i.year => year
   # c.year => year
@@ -36,7 +36,7 @@ stata_expr_to_cterm = function(stata_expr) {
   # ib2000.year => year
   # b2000.year => year
   # will generate full dummy set with reference level 2000
-  cterm = stringi::stri_replace_all_regex(cterm, "#[iI]?[bB]([0-9]+)\\.","" )
+  cterm = stringi::stri_replace_all_regex(cterm, "#[iI]?[bB]([0-9]+)\\.","#" )
   cterm = stringi::stri_replace_all_regex(cterm, "^[iI]?[bB]([0-9]+)\\.","" )
 
   # L1.year => L1@year
