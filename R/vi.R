@@ -55,9 +55,11 @@ vi.from.stata.reg = function(reg, dat) {
   if (reg$cmd %in% c("xtreg") & "fe" %in% reg$opts.df[[1]]$opt) {
     fe.var = reg$panelvar
     if (is_empty(fe.var)) {
+      #note_problem(problem_type="xtreg_fe_no_panelvar","xtreg specifies fe but no panelvar is set",stop = FALSE )
       stop("xtreg specifies fe but no panelvar is set")
+    } else {
+      vi = bind_rows(vi, tibble(ia_expr = fe.var, main_pos = NROW(vi)+1, is_ia=FALSE,role="exo", option="fe"))
     }
-    vi = bind_rows(vi, tibble(ia_expr = fe.var, main_pos = NROW(vi)+1, is_ia=FALSE,role="exo", option="fe"))
   }
 
   # Add cluster se variables

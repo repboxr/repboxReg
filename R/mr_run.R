@@ -203,7 +203,7 @@ mr_run_for_source_step = function(mr, source_step, path.df) {
     # An analysis step
     if (step.df$step_type[cur.step]=="a" & !(source_was_analyzed & cur.step==source_step)) {
       #stop("Analysis steps not yet implemented")
-      mr_cat("\nAnalysis step ", cur.step, ":  ", shorten.str(step.df$steplab[cur.step],30),"\n")
+      mr_cat(paste0("\nAnalysis step ", cur.step, " ", step.df$dofile, " L", step.df$orgline, ": ", shorten.str(step.df$steplab[cur.step],100),"\n"))
 
       step.start = as.numeric(Sys.time())
       check_row = which(mr$check_df$step == cur.step)
