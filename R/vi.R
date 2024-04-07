@@ -39,8 +39,8 @@ vi.from.stata.reg = function(reg, dat) {
   if (reg$cmd %in% c("areg","reghdfe")) {
     opts.df = reg$opts.df[[1]]
     # Update "a" is an abbreviation for absorb
-    if (reg$cmd == "areg") {
-      row = which(opts.df$opt %in% c("absorb","a","ab"))
+    if (reg$cmd %in% c("areg", "reghdfe")) {
+      row = which(opts.df$opt %in% c("absorb","a","ab","abs","abso","absor"))
     } else {
       row = which(opts.df$opt=="absorb")
     }

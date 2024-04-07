@@ -241,7 +241,7 @@ expand.stata.var.patterns = function(pattern, cols, unlist=TRUE, uses_xi=FALSE) 
   # If a column is uniquely identified Stata can use abbreviations
   # E.g. reg y x  works if only the columns y and x1 exist.
   # Here x is an abbreviation for x
-  no.match.rows = which(!(pattern.rhs[normal.rows] %in% cols))
+  no.match.rows = normal.rows[which(!(pattern.rhs[normal.rows] %in% cols))]
   if (length(no.match.rows)>0) {
     for (row in no.match.rows) {
       mcols = which(startsWith(cols, pattern.rhs[row]))
