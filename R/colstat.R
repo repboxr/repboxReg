@@ -149,8 +149,8 @@ colstat_numeric = function(col,df, reg_df=df, val = df[[col]], reg_val = reg_df[
 
     mean = mean(v, na.rm=TRUE),
     sd = sd(v, na.rm=TRUE),
-    min = min(v, na.rm=TRUE),
-    max = max(v, na.rm=TRUE),
+    min = suppressWarnings(min(v, na.rm=TRUE)),
+    max = suppressWarnings(max(v, na.rm=TRUE)),
     median = median(v, na.rm=TRUE),
 
     q10 = qu[1],

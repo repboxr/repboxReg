@@ -197,6 +197,8 @@ example = function() {
 
 
 
+# TO DO: Currently functionality is still doubled in older function
+# stata.regs.parse at some point, we should unify it into this bigger function
 cmdparts_of_stata_reg = function(cmdlines) {
   restore.point("stata_reg_cmdpart")
 
@@ -206,6 +208,24 @@ cmdparts_of_stata_reg = function(cmdlines) {
   # Otherwise we wont correctly store the cmd
   # variable
   str = gsub("\t"," ", str, fixed=TRUE)
+
+
+  # For some really tricky if conditions or similar
+  # We first replace brackets and quotes by placeholders
+  # reg y x1 if (i==1) | i==2 | inlist(f1, "A" "B") [aw=x1] in 5/25, robust   level( 95  )
+
+  txt = paste0(str, collapse = "\n")
+  pho = try(blocks.to.placeholder(txt, start=c("("), end=c(")"), ph.prefix = "#~br"))
+  if (is(pho,"try-error")) {
+    pho = stepwise.blocks.to.placeholder(str)
+  }
+
+  # In our example we have now
+  # str = " if #~br1~# | i==2 | inlist#~br2~# [aw=x1] in 5/25 , robust"
+  str = strsplit(pho$str,split = "\n")[[1]]
+  ph.df = pho$ph.df
+
+
 
   cp = cp_init(str)
 
@@ -289,7 +309,7 @@ cmdparts_of_stata_reg = function(cmdlines) {
   df = cp$df
 
 
-  # weight_str, in_str and if_atr #################################
+  # weight_str, in_str and if_str #################################
 
   # Now it is getting a bit more complicated
   # We want to set if_str, in_str and weight_str
@@ -394,6 +414,14 @@ cmdparts_of_stata_reg = function(cmdlines) {
   cp$str
 
   # options ###########################################
+
+  # cp$str now looks e.g. like
+  # {{cmd}} {{varlist}} {{if_str}} {{weight_str}} {{in_str}}, robust   level#~br3~#
+
+  # We now replace bracket placeholders again since option parsing deals on its own with brackets
+  cp$str = replace.placeholders(cp$str, ph.df)
+  cp$df$content = replace.placeholders(cp$df$content, ph.df)
+
 
   start = stri_locate_first_regex(cp$str,",")[,1]+1
   end = nchar(cp$str)

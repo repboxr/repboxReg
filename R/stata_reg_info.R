@@ -353,7 +353,29 @@ stata.regs.parse = function(reg.df=NULL, cmdlines=reg.df$cmdline, creg.num = reg
   var.df = parse.stata.reg.vars(cmd, str)
   str = var.df$str
 
+  # We now want to parse the string after the varlist
+  # Here is an example of a real complex form
+
+  # reg y x1 if (i==1) | i==2 | inlist(f1, "A" "B") [aw=x1] in 5/25, robust
+
+  # 1. Replace brackets with placeholder
+  #    Implicitly assumes that there are no string constants
+  #    that contain non-matched brackets
+  txt = paste0(str, collapse = "\n")
+  pho = try(blocks.to.placeholder(txt, start=c("("), end=c(")"), ph.prefix = "#~br"))
+  if (is(pho,"try-error")) {
+    pho = stepwise.blocks.to.placeholder(str)
+  }
+
+  # In our example we have now
+  # str = " if #~br1~# | i==2 | inlist#~br2~# [aw=x1] in 5/25 , robust"
+  str = strsplit(pho$str,split = "\n")[[1]]
+  ph.df = pho$ph.df
+
+  # Any commas in if condition should now be part of the brackets
+  # placeholder, and options start after comma in str
   opts_str = str.right.of(str,",",not.found=NA) %>% trimws()
+
   str = str.left.of(str,",")
 
   # Parsing weights is a bit more complex because
@@ -370,8 +392,16 @@ stata.regs.parse = function(reg.df=NULL, cmdlines=reg.df$cmdline, creg.num = reg
   }
 
   weights_str = substring(str, weight_left+1, weight_right-1)
+  # Note: Usually the weight specification should not have any ()
+  #       so we don't need to replace placeholders. But better add
+  #       a check
+  if (isTRUE(any(has.substr(weights_str,"#~br"), na.rm = TRUE))) {
+    repbox_problem("We encountered a weight specifications in regression that use parenthesis","weight_with_parenthesis",fail_action = "msg")
+    weights_str =  replace.placeholders(weights_str, ph.df)
+  }
   weights_type = substring(trimws(weights_str),1,1)
   weights_var = str.right.of(weights_str,"=") %>% trimws()
+
 
   rows = !is.na(weights_str)
   str[rows] = str.cutout(str, weight_left, weight_right)
@@ -384,7 +414,10 @@ stata.regs.parse = function(reg.df=NULL, cmdlines=reg.df$cmdline, creg.num = reg
   in_right = pmin(nchar(str),if_left-1, na.rm=TRUE)
 
   if_str = substring(str, if_left+3, if_right) %>% trimws()
+  if_str = replace.placeholders(if_str, ph.df) # replace possible ()
+
   in_str = substring(str, in_left+3, in_right) %>% trimws()
+  in_str =  replace.placeholders(in_str, ph.df) # replace possible ()
 
   if (is.null(timevar)) timevar = NA
   if (is.null(panelvar)) panelvar = NA
@@ -392,7 +425,7 @@ stata.regs.parse = function(reg.df=NULL, cmdlines=reg.df$cmdline, creg.num = reg
 
   reg.info = tibble(creg.num = creg.num, cmdline=cmdlines, cmd, depvar=var.df$depvar, xformula=var.df$xformula, exo_parts=var.df$exo_parts, endo_parts=var.df$endo_parts, instr_parts=var.df$instr_parts, weights_type=weights_type, weights_var=weights_var, weights_str, opts_str, if_str, in_str, uses_xi, colon1, colon2, colon3, timevar = timevar, panelvar=panelvar, tdelta=tdelta)
 
-  reg.info = add_stata_reg_opts(reg.info)
+  reg.info = add_stata_reg_opts(reg.info, pho=pho)
   reg.info
 }
 
@@ -531,7 +564,7 @@ parse.stata.reg.vars.default = function(cmd, str, rows) {
 }
 
 
-add_stata_reg_opts = function(reg.info) {
+add_stata_reg_opts = function(reg.info, pho=NULL) {
   restore.point("add_stata_reg_opts")
   #opts_str[1] = "jd asb xhb(sdg)"
   opts_str = reg.info$opts_str
@@ -544,14 +577,20 @@ add_stata_reg_opts = function(reg.info) {
   opts_str[is.na(opts_str)] = "-"
 
 
-  txt = paste0(opts_str, collapse = "\n")
-  txt = shorten.spaces(txt)
-  pho = try(blocks.to.placeholder(txt, start=c("("), end=c(")"), ph.prefix = "#~br"))
-  if (is(pho,"try-error")) {
-    pho = stepwise.blocks.to.placeholder(opts_str)
+  if (is.null(pho)) {
+    txt = paste0(opts_str, collapse = "\n")
+    txt = shorten.spaces(txt)
+    pho = try(blocks.to.placeholder(txt, start=c("("), end=c(")"), ph.prefix = "#~br"))
+    if (is(pho,"try-error")) {
+      pho = stepwise.blocks.to.placeholder(opts_str)
+    }
+    txt = pho$str; ph.df = pho$ph.df
+    txt = strsplit(txt,"\n",fixed = TRUE)[[1]]
+  } else {
+    txt = opts_str
+    txt = shorten.spaces(txt)
+    ph.df = pho$ph.df
   }
-  txt = pho$str; ph.df = pho$ph.df
-  txt = strsplit(txt,"\n",fixed = TRUE)[[1]]
   txt[txt == "-"] = ""
 
   opts_li = strsplit(txt, " ", fixed=TRUE)
