@@ -292,8 +292,18 @@ mr_base_step_run_fun =  function(mr,step, reg, dat, org_dat, infeasible_filter, 
 
   vi = reg$vi[[1]]
 
+
+  # We want to generate also columns for all dummies
+  # shown in resulting coefficient tables
+  # Yet, some commands like xtlogit, show additional
+  # coefficients that don't map to any x-variable
+  # we need to remove them.
+  ct_cterms = setdiff(org_ct$cterm,c("lnsig2u"))
+
   # All columns relevant for the regression
-  cols = unique(c(reg$depvar,reg$panelvar, reg$timevar, org_ct$cterm, vi[["var"]], vi$cterm, vi$ia_cterm)) %>% setdiff(c("(Intercept)",""))
+  cols = unique(c(reg$depvar,reg$panelvar, reg$timevar, ct_cterms, vi[["var"]], vi$cterm, vi$ia_cterm)) %>% setdiff(c("(Intercept)",""))
+
+
 
   #cols = unique(c(reg$depvar,reg$panelvar, reg$timevar, vi[["var"]], vi$cterm, vi$ia_cterm)) %>% setdiff(c("(Intercept)",""))
 

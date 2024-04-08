@@ -223,6 +223,7 @@ cmdparts_of_stata_reg = function(cmdlines) {
   # In our example we have now
   # str = " if #~br1~# | i==2 | inlist#~br2~# [aw=x1] in 5/25 , robust"
   str = strsplit(pho$str,split = "\n")[[1]]
+  if (length(str)==0) str = ""
   ph.df = pho$ph.df
 
 

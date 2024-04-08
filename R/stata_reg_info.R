@@ -371,6 +371,7 @@ stata.regs.parse = function(reg.df=NULL, cmdlines=reg.df$cmdline, creg.num = reg
   # str = " if #~br1~# | i==2 | inlist#~br2~# [aw=x1] in 5/25 , robust"
   str = strsplit(pho$str,split = "\n")[[1]]
   ph.df = pho$ph.df
+  if (length(str)==0) str = ""
 
   # Any commas in if condition should now be part of the brackets
   # placeholder, and options start after comma in str
