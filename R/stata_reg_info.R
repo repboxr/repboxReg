@@ -533,7 +533,10 @@ parse.stata.reg.vars.iv = function(cmd, str, rows, has.method = FALSE) {
 
 parse.stata.reg.vars.reghdfe = function(cmd, str, rows, has.method = FALSE) {
   restore.point("parse.stata.reg.vars.reghdfe")
-  before_opt_str = str.left.of(str,",")
+
+  end.pos = stringi::stri_locate_first_regex(str, "(,)|( if )|(\\[)|( in )|$")[,1]-1
+  before_opt_str = stringi::stri_sub(str,1, end.pos)
+
   if (has.substr(before_opt_str, "(")) {
     parse.stata.reg.vars.iv(cmd, str, rows, has.method)
   } else {
