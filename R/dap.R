@@ -643,5 +643,63 @@ dap.to.store.data = function(dap, cache.dir) {
       file = paste0(cache.dir,"/step_",step,".dta"),
       xtset_file = paste0(cache.dir,"/xtset_",step,".csv")
     )
+}
 
+# Matches stored stata scalar values
+# with DAP steps
+dap_create_stata_scalar_info = function(project_dir, dap, scalar_df=NULL, save_dap=TRUE) {
+  restore.point("dap_create_stata_scalar_info")
+  if (is.null(scalar_df)) {
+    scalar_df = readRDS.or.null(file.path(project_df,"repdb/stata_scalar.Rds"))$stata_scalar$stata_scalar
+    if (is.null(scalar_df)) {
+      return(dap)
+    }
+  }
+
+  step.df = dap$step.df
+
+  scalars = unique(scalar_df$scalar_var)
+
+  # First restrict attention to possibly relevant scalars
+  all_code = paste0(unique(dap$step.df$cmdline), collapse="\n")
+  rx = paste0("(?<![:alnum:_])", scalars, "(?![:alnum:_])")
+  found = stri_detect_regex(all_code, rx)
+  scalars = scalars[found]
+  if (length(scalars)==0) {
+    return(dap)
+  }
+
+  scalar_df = scalar_df[scalar_df$scalar_var %in% scalars,]
+
+  smap_df = lapply(scalars, function(s) {
+    rx = paste0("(?<![:alnum:_])", s, "(?![:alnum:_])")
+    found = stri_detect_regex(step.df$cmdline, rx)
+    as_tibble(list(step = step.df$step[found],scalar_var = rep(s, sum(found))  ))
+  }) %>% bind_rows()
+
+  scalar.df = full_join(smap_df, scalar_df %>% rename(scalar_runid=runid), by="scalar_var") %>%
+    left_join(step.df %>% select(step, step_runid=runid), by = "step") %>%
+    # Filter the last scalar definition
+    # for each step
+    filter(scalar_runid <= step_runid) %>%
+    arrange(step, scalar_runid) %>%
+    group_by(step) %>%
+    slice(n()) %>%
+    ungroup() %>%
+    select(step, scalar_var, scalar_val, scalar_num_val) %>%
+    mutate(is_num = !is.na(scalar_num_val))
+
+  dap$scalar.df = scalar.df
+
+  if (save_dap) {
+    dap.file = file.path(project_dir,"metareg/dap/stata/dap.Rds")
+    saveRDS(dap, dap.file)
+
+    # Need to reset timestamps of cache files
+    # to avoid error msg
+    cache.files =list.files(file.path(project_dir,"metareg/dap/stata/cache"), full.names = TRUE)
+    try(touchFile(cache.files))
+
+  }
+  dap
 }

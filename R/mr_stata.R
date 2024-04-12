@@ -65,6 +65,24 @@ mr_run_all_stata_code = function(mr, nostop = FALSE) {
   mr
 }
 
+dap_scalar_df_to_stata_step_code = function(scalar.df, steps) {
+  restore.point("dap_scalar_df_to_step_code")
+  if (is.null(scalar.df)) return(rep("", length(steps)))
+  code_df = scalar.df %>%
+    filter(step %in% steps) %>%
+    mutate(
+      scalar_code = paste0("\nscalar ", scalar_var, " = ", ifelse(is_num, scalar_num_val, paste0('"', scalar_val,'"')), "\n")
+    ) %>%
+    group_by(step) %>%
+    summarize(
+      scalar_code = paste0(scalar_code, collapse="")
+    )
+
+  code = rep("", length(steps))
+  inds = match(code_df$step, steps)
+  code[inds] = code_df$scalar_code
+  code
+}
 
 
 mr_make_all_stata_code = function(mr, stata_code_fun=mr$stata_code_fun, asteps = mr_get_asteps(mr), changes.data = TRUE, stata.preserve.always = mr$opts$stata.preserve.always) {
@@ -119,6 +137,13 @@ mr_make_all_stata_code = function(mr, stata_code_fun=mr$stata_code_fun, asteps =
   })
   step.df$stata_code[asteps] = acode
 
+
+  # Code that regenerates Stata scalars that are used in steps
+  # we may duplicate the scalar generation if a particular scalar
+  # is used in several steps. But that does not seem to be a big
+  # problem
+  step.df$scalar_code = dap_scalar_df_to_stata_step_code(mr[["scalar.df"]], step.df$step)
+
   #step.df$stata_code[source_steps] = load_code
 
 
@@ -161,7 +186,7 @@ mr_make_all_stata_code = function(mr, stata_code_fun=mr$stata_code_fun, asteps =
       )
     }
 
-    all.code = paste0(step.df$load_code[steps],step.df$stata_code[steps])
+    all.code = paste0(step.df$scalar_code[steps],step.df$load_code[steps],step.df$stata_code[steps])
 
     all.code = c(ado.code, all.code)
 
@@ -193,7 +218,9 @@ mr_write_path_stata_code = function(mr, astep=first(mr$path.df$astep), code.file
 
   # 2. code for all other steps data modification steps
   steps = path$step[-1]
-  txt = paste0(txt,"\n", paste0(mr$step.df$stata_code[steps], collapse = "\n"))
+  scalar_code = dap_scalar_df_to_stata_step_code(mr$scalar.df, steps)
+
+  txt = paste0(txt,"\n", paste0(scalar_code, mr$step.df$stata_code[steps], collapse = "\n"))
 
   writeLines(txt, code.file)
   invisible(txt)

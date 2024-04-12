@@ -81,6 +81,7 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
   mr$dap_version = dap$version
   mr$step.df = dap$step.df
   mr$path.df = dap$path.df
+  mr$scalar.df = dap[["scalar.df"]]
   mr$res.li = vector("list", NROW(mr$step.df))
   mr$run.df = dap$run.df
 
