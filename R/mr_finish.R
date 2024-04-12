@@ -5,14 +5,15 @@ mr_finish = function(mr, show_msg=TRUE, save_header = mr$opts$save.header) {
   restore.point("mr_finish")
 
   if (mr_has_problem(mr)) {
+    # TO DO: Possibly use repbox_problem instead
     problem.file = file.path(mr$out_dir,"problem.txt")
-    writeLines(problem.file, mr[["problem"]])
+    writeLines(mr[["problem"]], problem.file)
     return(mr)
   }
 
   header = mr_get_header(mr)
   if (is.null(header) & !isTRUE(mr$did_run)) {
-    mr =mr_set_no_run_header(mr)
+    mr = mr_set_no_run_header(mr)
     header = mr_get_header(mr)
   } else if (is.null(header)) {
     stop("No header was found in mr. Make sure that you call mr_set_header, e.g. in your study_agg_fun or afterward before you run mr_finish.")

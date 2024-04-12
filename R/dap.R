@@ -80,7 +80,8 @@ get.project.dap = function(project_dir,make.if.missing=FALSE, add.run.df=FALSE) 
   return(dap)
 }
 
-make.dap = function(run.df, reg.nodes = which(run.df$is.regcmd), set.random.time=FALSE, find.infeasible.steps.fun = default.find.infeasible.steps, dotab=NULL, extra.inf.dir = NULL) {
+# Update only generate DAP for regressions that do not have missing data
+make.dap = function(run.df, reg.nodes = which(run.df$is.regcmd & run.df$has.data), set.random.time=FALSE, find.infeasible.steps.fun = default.find.infeasible.steps, dotab=NULL, extra.inf.dir = NULL) {
   restore.point("make.dap")
   path.df = make.data.path.df(run.df,nodes = reg.nodes)
   if (is.null(path.df)) return(NULL)

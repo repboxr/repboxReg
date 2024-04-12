@@ -65,6 +65,13 @@ extract.stata.regs = function(project_dir, run.df=NULL, dotab=NULL, save=TRUE) {
 
   regtab = left_join(regtab,run.df, by=c("donum","line","counter"))%>%
     left_join(select(dotab, donum, doid), by=c("donum"))
+
+  # UPDATE: Only consider regression where missing_data = FALSE
+  # Otherwise we likely have faulty regressions that use an earlier data set
+  # Also ignore regression results with run error
+  regtab = regtab[regtab$has.data & !regtab$runerr,]
+
+
   regtab$project = project
   #colnames(regtab)
   cols = c("project", "donum", "doid", "line", "counter","cmd", "cmdline","ct","er", "datasig", "timevar" ,"panelvar", "tdelta",        "runerr",        "runerrcode",    "runerrmsg",     "runsec", "orgline", "in.program", "has.data")

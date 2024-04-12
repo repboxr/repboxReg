@@ -115,7 +115,7 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
   mr$stata_agg_fun = stata_agg_fun
   mr$study_agg_fun = study_agg_fun
 
-  clear_problem_files
+  clear_problem_files(mr)
   check = dap_check_all_cache_files_exist(project_dir, mr$step.df)
   if (!check$ok) {
     mr = mr_set_problem(mr, "missing_cache", paste0(
