@@ -182,7 +182,7 @@ reg.match = function(project_dir, verbose=TRUE) {
       tab_par_match_score = sum(ar_num_match)
     ) %>%
     group_by(tabid) %>%
-    mutate(is_best_par_type = tab_par_match_score == max(tab_par_match_score)) %>%
+    mutate(is_best_par_type = suppressWarnings(tab_par_match_score == max(tab_par_match_score))) %>%
     ungroup()
 
 
