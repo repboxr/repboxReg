@@ -141,7 +141,7 @@ mr_base_stata_agg_fun = function(mr, stata_check_df, ...) {
   stata_ct = mr_agg_add_dprobit_coef(mr, stata_ct)
 
   if (NROW(stata_ct)==0 & NROW(ct)>0) {
-    note_problem(problem_type="stata_ct_empty","No coefficients extracted from re-run of regression in mr_base metareg sandbox. There seems to be something in the original stata code that our sandbox still misses.", step=step,stop = TRUE)
+    repbox_problem(type="stata_ct_empty",msg = "No coefficients extracted from re-run of regression in mr_base metareg sandbox. There seems to be something in the original stata code that our sandbox still misses.", fail_action="error")
 
     # For some applications like data editor tool
     # we may want to proceed despite this problem
@@ -149,7 +149,7 @@ mr_base_stata_agg_fun = function(mr, stata_check_df, ...) {
     #stata_ct = ct
     #stata_ct$variant = "sb"
   } else if (NROW(stata_ct) < NROW(ct)) {
-    repbox_problem(type="stata_ct_too_few_rows","stata_ct from metareg sandbox has fewer rows than origina run ct.", step=step,stop = TRUE)
+    repbox_problem(type="stata_ct_too_few_rows",msg = "stata_ct from metareg sandbox has fewer rows than origina run ct.", fail_action = "msg")
   }
 
 

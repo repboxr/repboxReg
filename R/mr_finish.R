@@ -19,9 +19,12 @@ mr_finish = function(mr, show_msg=TRUE, save_header = mr$opts$save.header) {
     stop("No header was found in mr. Make sure that you call mr_set_header, e.g. in your study_agg_fun or afterward before you run mr_finish.")
   }
 
+  msg = repdb_get_check_msg_from_header(header)
 
-  if (show_msg) {
-    cat(paste0("\n",repdb_get_check_msg_from_header(header)),"\n")
+  if (header$num_problem >0) {
+    repbox_problem(type="reg_problem",msg=msg, fail_action="msg")
+  } else if (show_msg) {
+    cat(paste0("\n",msg),"\n")
   }
 
   if (save_header) {
