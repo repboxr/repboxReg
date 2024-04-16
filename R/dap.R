@@ -377,8 +377,25 @@ path.df.to.dap = function(path.df, run.df) {
 
   org.path.df = path.df
 
+  # path_df still has the old notation
+  #
+  # step = runid
+  #
+  # dstep is either run_id or if not NA the dataid_num
+  #       equal data sets that are loaded twice will
+  #       thus be loaded only once
+  #
+  # node  the runid of the analysis step
+  # snode runid of the data loading step
+
+
+  # step.df will combine the same steps from path_df
+  #         later we will aggregate subsequent
+  #         modification steps to single steps
+  # NEW:    Only perform aggregation if the complete
+  #         step group is in all paths.
   org.step.df = step.df = path.df %>%
-    group_by(node) %>%
+    group_by(node) %>%  # by runid of analysis step
     mutate(
       next_step = lead(step),
       next_step_type = lead(step_type),
@@ -393,11 +410,16 @@ path.df.to.dap = function(path.df, run.df) {
       next_step_type = first(next_step_type),
       num_next_step = n_distinct(next_step, na.rm=TRUE),
       add_next_step = first(is.true(step_type == "mod" & next_step_type == "mod" & num_next_step==1)),
-      stata_code = first(stata_code)
+      stata_code = first(stata_code),
+      # New check in which paths the step is contained
+      step_paths = paste0(sort(node), collapse="|")
     ) %>%
     ungroup() %>%
     mutate(
-      add_next_step = add_next_step & is.true(lead(step) == next_step),
+      # Updated: Only form a step_group if
+      # all steps are contained in the same set of paths
+      # otherwise we get problems in certain preserve/restore constructions
+      add_next_step = add_next_step & is.true(lead(step) == next_step) & is.true(lead(step_paths)==step_paths),
       add_prev_step = is.true(lag(add_next_step)),
       step_group = cumsum(1-add_prev_step)
     ) %>%
