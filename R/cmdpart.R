@@ -267,10 +267,13 @@ cmdparts_of_stata_reg = function(cmdlines) {
   cmds = cp$df$content[cp$df$part=="cmd"]
   vl_rows = which(cp$df$part=="varlist")
   varlists = cp$df$content[vl_rows]
-  i = 2
+
+  i = 1
   for (i in seq_along(cmds)) {
 
-    rv = parse.stata.reg.vars(cmds[i], varlists[i])
+    # Update replace () placeholders for correct parsing
+    vl = replace.placeholders(varlists[i], ph.df)
+    rv = parse.stata.reg.vars(cmds[i], vl)
 
     # The varlist contains another cmd specifier (case for ivregress)
     if (!is_empty(rv$method)) {
@@ -553,8 +556,13 @@ cmdpart_parse_stata_opt_str = function(str) {
   # )
 
 
+  # We have examples like absorb(var)r
+  # we need to transform it to absorb(var) r
+  str = stri_replace_all_regex(str,"\\)(?=[a-zA-Z])",") ")
+
 
   all_opt_str = all_opt = all_opt_arg = vector("list",NROW(str))
+
 
   i = 1
   for (i in seq_along(str)) {

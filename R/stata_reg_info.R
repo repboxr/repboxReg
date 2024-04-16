@@ -451,6 +451,17 @@ parse.stata.reg.vars = function(cmd, str) {
   str = trimws_around(str, "-")
 
 
+  # Correct rows like
+  # reg y x1 (ib1.i1 )#i.year, robust
+  # reg y x1 (ib1.i1 )#(i.year), robust
+  # reg y x1 ib1.i1##(i.year##i.i2), robust
+
+  # Note that reg y (x) would not be allowed
+  # so we can use the # as crucial pattern
+  str = stri_replace_all_regex(str,"\\([ ]*([a-zA-Z0-9_.#]+)[ ]*\\)#","$1#")
+  str = stri_replace_all_regex(str,"#\\([ ]*([a-zA-Z0-9_.#]+)[ ]*\\)","#$1")
+
+
 
   rem_rows = seq_along(str)
 
@@ -572,6 +583,14 @@ add_stata_reg_opts = function(reg.info, pho=NULL) {
   restore.point("add_stata_reg_opts")
   #opts_str[1] = "jd asb xhb(sdg)"
   opts_str = reg.info$opts_str
+
+  # We have examples like absorb(var)r
+  # we need to transform it to absorb(var) r
+  # Note that (var) will be replaced by a placeholder
+  # and we have absorb#~br1~#r which becomes absorb#~br1~#r
+  opts_str = stri_replace_all_regex(opts_str,"~#(?=[a-zA-Z])","~# ")
+
+
   if (all(is.na(opts_str))) {
     reg.info$opts.df = vector("list",NROW(reg.info))
     return(reg.info)
