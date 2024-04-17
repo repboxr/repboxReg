@@ -88,11 +88,22 @@ vi.from.stata.reg = function(reg, dat) {
 
   cols_info = make_cols_small_info(dat)
 
+
+  # Split L1.x into prefix = L1; var = x
+  #   L1.S2.x into prefix = L1S2 var = x
+  prefix.start = stri_locate_last_fixed(vi$var_expr,".")[,1]
+
+  vi$prefix = ifelse(is.na(prefix.start),
+    "",
+    stri_sub(vi$var_expr,1,prefix.start-1) %>%
+      stri_replace_all_fixed(".","")
+  )
+  vi$var = ifelse(is.na(prefix.start),
+    vi$var_expr,
+    stri_sub(vi$var_expr,prefix.start+1)
+  )
+
   vi = vi %>%
-    mutate(
-      prefix = str.left.of(var_expr,".",not.found = rep("", n())),
-      var = str.right.of(var_expr,"."),
-    ) %>%
     mutate(
       prefix = case_when(
         # Transforms e.g. ib2005.year into equivalent code b2005.year

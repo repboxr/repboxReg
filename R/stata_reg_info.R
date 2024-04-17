@@ -204,6 +204,16 @@ example.expand.stata.var.patterns = function(){
 expand.stata.var.patterns = function(pattern, cols, unlist=TRUE, uses_xi=FALSE) {
   restore.point("expand.stata.var.patterns")
 
+  if (uses_xi) {
+    # Also split |.
+    # Note that xi reg y f|x differs from xi reg y f*x
+    # since f|x does not generate main effects for f
+    # we will currently ignore this. This will be relevant
+    # when translating to R.
+    if (!is.null(pattern)) {
+      pattern = stri_replace_all_fixed(pattern, "|","#")
+    }
+  }
   # If there are interaction terms: split them up
   ia.rows = which(has.substr(pattern,"#"))
   if (length(ia.rows)>0) {

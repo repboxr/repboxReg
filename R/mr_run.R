@@ -486,6 +486,7 @@ collapse.test = function() {
 # L2.x1
 # but we currently ignore things like
 # L(0/4).x1
+# L2.S1.x1
 mr_create_stata_timeseries_var = function(dat,var, prefix,reg, sep=".") {
   restore.point("mr_create_stata_timeseries_var")
 
@@ -500,8 +501,15 @@ mr_create_stata_timeseries_var = function(dat,var, prefix,reg, sep=".") {
   #}
 
   if (any(has.substr(prefix.num,"("))) {
-    return(mr_infeasible("\nCannot yet deal with time series prefixes like L(0/2).",problem="prefix_("))
+    repbox_problem(type="ts_prefix_L(0/2)", "\nCannot yet generate variables in the data set for time series prefixes like L(0/2).")
+    return(dat)
   }
+  if (any(stri_detect_regex(prefix.num,"[a-zA-Z]"))) {
+    repbox_problem(type="ts_prefix_L1.S1.x", "\nCannot yet generate variables in the data set for time series prefixes like L2.S1.x")
+    return(dat)
+  }
+
+
 
   args = list(x=dat[[var]], n=1)
   if (!is_empty(reg$timevar)) {

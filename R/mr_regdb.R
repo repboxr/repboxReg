@@ -171,6 +171,12 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   project = artid = .artid = basename(project_dir)
   parcels = list()
 
+  if (NROW(agg$regs)==0) {
+    cat("\nNo regression successfully analyzed and stored via base metareg.\n")
+    return(invisible(parcels))
+
+  }
+
   repdb.dir = mr$repdb_out_dir
   #dap = readRDS(file.path(project_dir, "repbox/stata/dap.Rds"))
 
@@ -182,6 +188,7 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   # 1 a) Create reg and regsource entries ####
 
   regs = agg$regs
+
   reg_dat = agg$org_regs %>%
     mutate(
       artid = .artid,
@@ -197,9 +204,9 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
     add_coalesce("nobs",c("N")) %>%
     add_coalesce("nobs_org") %>% # As NA
     add_coalesce("r2",c("r2","r2_p"))
-    #add_coalesce("df_r",c("df_r")) %>%
-    #add_coalesce("adj_r2",c("r2_a","ar2")) %>%
-    #add_coalesce("F",c("F"))
+  #add_coalesce("df_r",c("df_r")) %>%
+  #add_coalesce("adj_r2",c("r2_a","ar2")) %>%
+  #add_coalesce("F",c("F"))
 
 
   regs$iv_code = !sapply(regs$instr_parts, is.null)
