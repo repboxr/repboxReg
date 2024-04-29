@@ -1,0 +1,83 @@
+name: colinfo
+
+descr: >
+  Contains general information about a variable in the original data set.
+  Other than colstat we have a single table for all different data types.
+
+fields:
+  step:
+    type: int
+
+  var:
+    descr: Variable name as given in the orignal data set.
+
+  label:
+    descr: Possibly a column label provided in the Stata data set.
+
+  col_type_org:
+    descr: Original storage type of the column without repbox transformation.
+
+  col_type:
+    descr: integer, numeric, dummy, factor, ...
+
+  var_group:
+    descr: >
+      If the variable part of a variable group of the form {base}{int}
+      we return the name of the group.
+
+  dummy_set:
+    descr: >
+      If there is a var_group and all variables are dummies that
+      always add up to 1, we store the var_group name also a dummy set.
+
+  md5_org:
+    descr: md5 digest of the column's values in the original data set.
+
+  nobs_org:
+    type: int
+
+  nobs:
+    type: int
+
+  na_num_org:
+    descr: Number of NA values in the original data set before NA rows are dropped in regression
+    type: int
+
+  na_num:
+    descr: Number of NA values in the regression data set
+    type: int
+
+
+  distinct_num_org:
+    descr: Number of distinct values (excluding NA) in the original data set
+
+  distinct_num:
+    descr: Number of distinct values (excluding NA) in the regression data set
+
+  mean:
+    descr: Mean in the subset used for regression. NA for factor variables.
+    type: num
+
+  sd:
+    descr: Standard deviation
+    type: num
+
+  min:
+    descr: Minimum of the variable computed on the regression data set.
+    type: num
+
+  max:
+    descr: Maximum of the variable computed on the regression data set
+    type: num
+
+  top1_val:
+    descr: Value of the most common level in the regression data set
+
+  top1_num:
+    descr: Number of top1_val in the regression data set
+
+  top2_val:
+    descr: Value of second most common level in the regression data set
+
+  top2_num:
+    descr: Number of second top1_val in the regression data set

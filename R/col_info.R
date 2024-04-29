@@ -1,0 +1,104 @@
+# Store information about all columns in data set (not only those used in the regression)
+
+repbox_col_class = function(v, distinct_num = n_distinct(v)) {
+  restore.point("repbox_col_class")
+  if (is.numeric(v)) {
+    if (length(distinct_num)>0 & length(distinct_num)<=2) {
+      uni = unique(v)
+      if (all(uni %in% c(0,1))) {
+        return("dummy")
+      }
+    }
+    # need to add try since integer conversion sometimes fails
+    # with error
+    if (isTRUE((try(all(v==suppressWarnings(as.integer(v)),na.rm=TRUE), silent=TRUE)))) return("integer")
+    return("numeric")
+  }
+  atomic_class(v)
+}
+
+
+repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
+  restore.point("repbox_store_all_col_info")
+  #stop()
+  cols = names(org_dat)
+  # Only use rows used in regression
+  dat = dat[cols]
+
+  var.labels <- attr(org_dat,"var.labels")
+  if (!is.null(var.labels)) {
+    stop("Need to deal with variable labels!")
+  }
+
+
+
+
+  options(warn=1)
+  colinfo_li = lapply(cols, function(col) {
+    restore.point("jhsjkfhkshdfjh")
+    val = dat[[col]]
+    org_val = org_dat[[col]]
+
+    val_tab = sort(table(val), decreasing = TRUE)[1:2]
+    top = names(val_tab)
+    distinct_num_org = n_distinct(org_val, na.rm = TRUE)
+
+
+    res = list(
+      step = step,
+      var = col,
+      label = "", # TO DO: DEAL WITH LABELS
+      col_type_org = atomic_class(org_val),
+      col_type = repbox_col_class(org_val,distinct_num_org),
+      var_group = "",
+      dummy_set = "", # TO DO
+      md5_org = digest::digest(org_val),
+      nobs_org = NROW(org_dat),
+      nobs = NROW(dat),
+      na_num_org = sum(is.na(org_val)),
+      na_num = sum(is.na(val)),
+      distinct_num_org = distinct_num_org,
+      distinct_num = n_distinct(val, na.rm=TRUE),
+      mean = NA_real_, se = NA_real_, min = NA_real_, max=NA_real_,
+
+      top1_val = top[1],
+      top1_num = val_tab[top[1]],
+
+      top2_val = top[2],
+      top2_num = val_tab[top[2]]
+    )
+
+    if (is.numeric(val)) {
+      res$mean = mean(val, na.rm=TRUE)
+      res$sd = sd(val, na.rm=TRUE)
+      res$min = min(val, na.rm=TRUE)
+      res$max = max(val, na.rm=TRUE)
+    }
+    res
+  })
+  df = bind_rows(colinfo_li)
+
+
+  # Col groups
+  col_group = stri_match_first_regex(cols, "[a-zA-Z][a-zA-Z_]*(?=[0-9]+$)")[,1] %>% na.val("")
+  dupl_col_group = unique(col_group[duplicated(col_group)])
+  col_group[!col_group %in% dupl_col_group] = ""
+  df$var_group = col_group
+
+  dummy_var_groups = df %>%
+    filter(var_group != "") %>%
+    group_by(var_group) %>%
+    summarize(keep = all(col_type=="dummy")) %>%
+    filter(keep)
+
+  for (group in dummy_var_groups$var_group) {
+    gcols = which(df$var_group==group)
+    mat = as.matrix(org_dat[gcols])
+    rsum = rowSums(mat)
+    if (all(rsum==1, na.rm=TRUE) & !all(is.na(rsum))) {
+      df$dummy_set[gcols] = group
+    }
+  }
+  df
+
+}

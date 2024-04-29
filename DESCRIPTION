@@ -9,6 +9,6 @@ License: GPL >= 3.0
 Remotes: skranz/stringtools, skranz/dbmisc
 Depends: dplyr, data.table, restorepoint, dbmisc, stringtools,
          tidyr, fixest, collapse,
-         igraph, repboxDB, rio
+         igraph, repboxDB, rio, digest
 Encoding: UTF-8
 LazyData: true

@@ -262,6 +262,12 @@ mr_base_study_agg_fun = function(mr, ...) {
 
   if (mr$create.repdb) {
     base_to_repdb(mr=mr, agg=agg)
+
+    # Store step results
+    colinfo = repboxReg::mr_get_steps_result(mr, "colinfo",as_df = TRUE)
+    parcels = list(colinfo = list(colinfo=colinfo))
+    repdb_save_parcels(parcels, file.path(project_dir,"repdb"))
+
   }
 
   mr
@@ -351,6 +357,24 @@ mr_base_step_run_fun =  function(mr,step, reg, dat, org_dat, infeasible_filter, 
   reg$regxvar = list(regxvar)
 
   mr = mr_set_step_result(mr, step, reg=reg)
+
+
+  # colinfo
+  # Sample data set
+  if (NROW(dat)<=6) {
+    sample_dat = dat
+  } else {
+    sample_dat = bind_rows(head(dat,3), tail(dat,3))
+  }
+
+  sample_dat_dir = file.path(mr$project_dir,"metareg","base","sample_dat")
+  if (!dir.exists(sample_dat_dir)) dir.create(sample_dat_dir)
+  sample_file = file.path(sample_dat_dir,paste0("sampledat_", step, ".Rds"))
+  saveRDS(sample_dat, sample_file)
+
+  #repboxDB::repdb_check_data(colinfo,"colinfo")
+  mr = mr_set_step_result(mr, step, colinfo=colinfo)
+
 
   return(mr)
 }

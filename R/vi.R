@@ -151,11 +151,12 @@ vi.from.stata.reg = function(reg, dat) {
   # Used by repdb and colstat
   vi = vi %>% mutate(
     var_org_type = varclass %>% change_val(c("fe","character"),"factor"),
-    var_reg_type = class %>% change_val(c("fe","character"),"factor"),
+    var_reg_type = class %>% change_val(c("fe","character"),"factor") %>% change_val("logical","dummy"),
     ia_reg_type = ia_type %>%
       change_val("fe","factor") %>%
-      change_val("fe_numeric","factor_numeric"),
-  ) %>%
+      change_val("fe_numeric","factor_numeric") %>%
+      change_val("fe_logical","factor_dummy")
+    ) %>%
     mutate(
       var_reg_type = ifelse(role=="cluster", "factor", var_reg_type),
       ia_reg_type = ifelse(role=="cluster", "factor", ia_reg_type)
