@@ -1,11 +1,12 @@
 # Store information about all columns in data set (not only those used in the regression)
 
-repbox_col_class = function(v, distinct_num = n_distinct(v)) {
+repbox_col_class = function(v, distinct_num = n_distinct(v,na.rm = TRUE)) {
   restore.point("repbox_col_class")
   if (is.numeric(v)) {
+
     if (length(distinct_num)>0 & length(distinct_num)<=2) {
       uni = unique(v)
-      if (all(uni %in% c(0,1))) {
+      if (isTRUE(all(uni %in% c(0,1), na.rm=TRUE))) {
         return("dummy")
       }
     }
@@ -30,18 +31,15 @@ repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
     stop("Need to deal with variable labels!")
   }
 
-
-
-
-  options(warn=1)
   colinfo_li = lapply(cols, function(col) {
     restore.point("jhsjkfhkshdfjh")
     val = dat[[col]]
     org_val = org_dat[[col]]
 
-    val_tab = sort(table(val), decreasing = TRUE)[1:2]
-    top = names(val_tab)
+    val_tab = c(sort(table(val), decreasing = TRUE),NA,NA)[1:2]
+    top = c(names(val_tab),NA_character_,NA_character_)
     distinct_num_org = n_distinct(org_val, na.rm = TRUE)
+    distinct_num = n_distinct(val, na.rm = TRUE)
 
 
     res = list(
@@ -49,7 +47,7 @@ repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
       var = col,
       label = "", # TO DO: DEAL WITH LABELS
       col_type_org = atomic_class(org_val),
-      col_type = repbox_col_class(org_val,distinct_num_org),
+      col_type = repbox_col_class(val,distinct_num),
       var_group = "",
       dummy_set = "", # TO DO
       md5_org = digest::digest(org_val),
@@ -58,8 +56,8 @@ repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
       na_num_org = sum(is.na(org_val)),
       na_num = sum(is.na(val)),
       distinct_num_org = distinct_num_org,
-      distinct_num = n_distinct(val, na.rm=TRUE),
-      mean = NA_real_, se = NA_real_, min = NA_real_, max=NA_real_,
+      distinct_num = distinct_num,
+      mean = NA_real_, sd = NA_real_, min = NA_real_, max=NA_real_,
 
       top1_val = top[1],
       top1_num = val_tab[top[1]],
@@ -68,19 +66,20 @@ repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
       top2_num = val_tab[top[2]]
     )
 
-    if (is.numeric(val)) {
+    if (is.numeric(val) & distinct_num >0) {
       res$mean = mean(val, na.rm=TRUE)
       res$sd = sd(val, na.rm=TRUE)
       res$min = min(val, na.rm=TRUE)
       res$max = max(val, na.rm=TRUE)
     }
+    #as_tibble(res)
     res
   })
   df = bind_rows(colinfo_li)
 
 
   # Col groups
-  col_group = stri_match_first_regex(cols, "[a-zA-Z][a-zA-Z_]*(?=[0-9]+$)")[,1] %>% na.val("")
+  col_group = stri_match_first_regex(cols, "^[a-zA-Z][a-zA-Z_]*(?=[0-9]+$)")[,1] %>% na.val("")
   dupl_col_group = unique(col_group[duplicated(col_group)])
   col_group[!col_group %in% dupl_col_group] = ""
   df$var_group = col_group
