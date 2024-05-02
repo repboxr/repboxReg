@@ -372,6 +372,7 @@ mr_base_step_run_fun =  function(mr,step, reg, dat, org_dat, infeasible_filter, 
   sample_file = file.path(sample_dat_dir,paste0("sampledat_", step, ".Rds"))
   saveRDS(sample_dat, sample_file)
 
+  colinfo = repbox_compute_step_col_info(step, project_dir, dat, org_dat, reg)
   #repboxDB::repdb_check_data(colinfo,"colinfo")
   mr = mr_set_step_result(mr, step, colinfo=colinfo)
 
