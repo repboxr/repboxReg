@@ -287,7 +287,7 @@ create_cterm_col = function(dat, cterm, timevar=NA, panelvar=NA, tdelta=NA, chec
     dat[[cterm]] = NA
     # lnalpha is just shown in nbreg output but not a variable in the data set
     if (!isTRUE(cterm=="lnalpha")) {
-      note_problem("missing_var",paste0("Column ", cterm, " does not exist in data set and thus I cannot generate the cterm ", cterm))
+      note_problem("missing_var",paste0("Column ", cterm, " does not exist in data set and thus I cannot generate the cterm ", cterm), stop=FALSE)
     }
     return(dat)
 

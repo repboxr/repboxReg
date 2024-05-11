@@ -150,7 +150,11 @@ mr_make_extra_cache = function(mr, step) {
 mr_load_extra_cache = function(mr, step, cache.file = NULL) {
   if (is.null(cache.file)) {
     cache.file = paste0(mr$project_dir,"/metareg/extra_cache/step_", step, ".dta")
+    if (!file.exists(cache.file)) {
+      cache.file = paste0(mr$project_dir,"/metareg/dap/stata/extra_cache/step_", step, ".dta")
+    }
   }
+
   if (file.exists(cache.file)) {
     return(haven::read_dta(cache.file))
   }
@@ -199,7 +203,7 @@ mr_get_extra_infeasible_steps = function(project_dir=NULL, inf.dir = paste0(mr$p
 
 
 
-mr_get_extra_cache_files = function(project_dir=NULL, cache.dir = paste0(mr$project_dir,"/metareg/dap/stata/extra_cache")) {
+mr_get_extra_cache_files = function(project_dir=NULL, cache.dir = paste0(project_dir,"/metareg/dap/stata/extra_cache")) {
   restore.point("mr_get_extra_cache_files")
   if (!dir.exists(cache.dir)) return(NULL)
   files = c(
