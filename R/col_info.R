@@ -1,5 +1,19 @@
 # Store information about all columns in data set (not only those used in the regression)
 
+get_var_labels = function(dat) {
+  #var.labels <- attr(org_dat,"var.labels")
+  #if (!is.null(var.labels)) {
+  #  stop("Need to deal with variable labels!")
+  #}
+  labs= rep("", NCOL(dat))
+  names(labs) = names(dat)
+
+  labels = unlist(lapply(dat, function(v) attr(v, "label")))
+  labs[names(labels)] = labels
+  labs
+
+}
+
 repbox_col_class = function(v, distinct_num = n_distinct(v,na.rm = TRUE)) {
   restore.point("repbox_col_class")
   if (is.numeric(v)) {
@@ -19,6 +33,8 @@ repbox_col_class = function(v, distinct_num = n_distinct(v,na.rm = TRUE)) {
 }
 
 
+
+
 repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
   restore.point("repbox_store_all_col_info")
   #stop()
@@ -26,10 +42,7 @@ repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
   # Only use rows used in regression
   dat = dat[cols]
 
-  var.labels <- attr(org_dat,"var.labels")
-  if (!is.null(var.labels)) {
-    stop("Need to deal with variable labels!")
-  }
+  var_labels <-get_var_labels(org_dat)
 
   colinfo_li = lapply(cols, function(col) {
     restore.point("jhsjkfhkshdfjh")
@@ -45,7 +58,7 @@ repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
     res = list(
       step = step,
       var = col,
-      label = "", # TO DO: DEAL WITH LABELS
+      label = var_labels[col], # TO DO: DEAL WITH LABELS
       col_type_org = atomic_class(org_val),
       col_type = repbox_col_class(val,distinct_num),
       var_group = "",
