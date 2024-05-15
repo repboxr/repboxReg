@@ -26,8 +26,10 @@ vi.from.stata.reg = function(reg, dat) {
   endo_parts = expand.stata.var.patterns(endo_parts, cols, uses_xi=reg$uses_xi, unlist=TRUE)
   instr_parts = expand.stata.var.patterns(instr_parts, cols, uses_xi=reg$uses_xi, unlist=TRUE)
 
+  depvar = expand.stata.var.patterns(reg$depvar, cols, uses_xi=FALSE)
+
   vi = tibble(
-    ia_expr = c(reg$depvar, exo_parts,endo_parts, instr_parts)) %>%
+    ia_expr = c(depvar, exo_parts,endo_parts, instr_parts)) %>%
     mutate(
       main_pos = seq_len(n()),
       is_ia = grepl("(\\|)|(#)|(\\*)",ia_expr),
@@ -65,11 +67,14 @@ vi.from.stata.reg = function(reg, dat) {
   # Add cluster se variables
   clustervar = reg$se.info[[1]]$clustervar[[1]]
   if (length(clustervar)>0) {
+    clustervar = expand.stata.var.patterns(clustervar, cols, uses_xi=FALSE)
     vi = bind_rows(vi, tibble(ia_expr = clustervar, main_pos = seq_along(clustervar), is_ia=FALSE,role="cluster", option="se"))
   }
 
   # Add weights var
-  if (!is_empty(reg$weights_var)) {
+  weights_var = reg$weights_var
+  if (!is_empty(weights_var)) {
+    weights_var = expand.stata.var.patterns(weights_var, cols, uses_xi=FALSE)
     vi = bind_rows(vi, tibble(ia_expr = reg$weights_var, main_pos = 1, is_ia=FALSE,role="weight", option=""))
   }
 
