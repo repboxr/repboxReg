@@ -211,5 +211,5 @@ mr_get_extra_cache_files = function(project_dir=NULL, cache.dir = paste0(project
   )
   base = basename(files)
   steps = str.between(base,"step_",".") %>% as.integer()
-  tibble(step = step, cache_file = files)
+  tibble(step = steps, cache_file = files)
 }

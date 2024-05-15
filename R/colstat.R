@@ -2,7 +2,7 @@ make_cols_small_info = function(df, cols = colnames(df)) {
   restore.point("make_cols_small_info")
   distinct_num = sapply(cols, function(col) n_distinct(df[[col]]))
   class = sapply(seq_along(cols), function(j) {
-    restore.point("shkjfhkdhfkkd")
+    #restore.point("shkjfhkdhfkkd")
     v = df[[ cols[j] ]]
     if (is.numeric(v)) {
       if (length(distinct_num[j])>0 & length(distinct_num[j])<=2) {
