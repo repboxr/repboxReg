@@ -183,6 +183,7 @@ mr_base_stata_agg_fun = function(mr, stata_check_df, ...) {
 mr_base_study_agg_fun = function(mr, ...) {
   restore.point("mr_base_study_agg_fun")
   project = basename(mr$project_dir)
+  project_dir = mr$project_dir
 
   stata_agg = mr_get_result(mr, "stata_agg")
   org_regs = stata_agg$org_regs
@@ -277,6 +278,7 @@ mr_base_study_agg_fun = function(mr, ...) {
 mr_base_step_run_fun =  function(mr,step, reg, dat, org_dat, infeasible_filter, ...) {
   restore.point("mr_base_step_run_fun")
 
+  project_dir = mr$project_dir
   # Extract cmdpart, opts_df and se_info
   cmdpart = cmdparts_of_stata_reg(reg$cmdline)
   cmdpart$step = step
