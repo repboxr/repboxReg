@@ -93,6 +93,8 @@ repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
 
   # Col groups
   col_group = stri_match_first_regex(cols, "^[a-zA-Z][a-zA-Z_]*(?=[0-9]+$)")[,1] %>% na.val("")
+  # Also consider xi generated variables like _Iyear_2009
+  col_group = stri_match_first_regex(cols, "^[a-zA-Z_]+(?=[0-9]+$)")[,1] %>% na.val("")
   dupl_col_group = unique(col_group[duplicated(col_group)])
   col_group[!col_group %in% dupl_col_group] = ""
   df$var_group = col_group
@@ -113,4 +115,26 @@ repbox_compute_step_col_info = function(step, project_dir,dat, org_dat, reg) {
   }
   df
 
+}
+
+# Update for vargroup and dummy_set definitions that can be applied on
+# given colinfo
+recompute_colinfo_groups = function(colinfo) {
+  restore.point("recompute_colinfo_groups")
+  df = colinfo
+  cols = colinfo$var
+  # Col groups
+  #col_group = stri_match_first_regex(cols, "^[a-zA-Z][a-zA-Z_]*(?=[0-9]+$)")[,1] %>% na.val("")
+  # Also consider xi generated variables like _Iyear_2009
+  col_group = stri_match_first_regex(cols, "^[a-zA-Z_]+(?=[0-9]+$)")[,1] %>% na.val("")
+  dupl_col_group = unique(col_group[duplicated(col_group)])
+  col_group[!col_group %in% dupl_col_group] = ""
+  df$var_group = col_group
+
+  df$dummy_set = case_when(
+    df$dummy_set != "" ~ df$dummy_set,
+    startsWith(df$var_group, "_I") ~ df$var_group,
+    TRUE ~ ""
+  )
+  df
 }
