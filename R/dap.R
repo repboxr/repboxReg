@@ -84,7 +84,13 @@ get.project.dap = function(project_dir,make.if.missing=FALSE, add.run.df=FALSE) 
 make.dap = function(run.df, reg.nodes = which(run.df$is.regcmd & run.df$has.data), set.random.time=FALSE, find.infeasible.steps.fun = default.find.infeasible.steps, dotab=NULL, extra.inf.dir = NULL) {
   restore.point("make.dap")
   path.df = make.data.path.df(run.df,nodes = reg.nodes)
+
   if (is.null(path.df)) return(NULL)
+
+  # Add lineid to detect
+  # rows = path.df$step
+  # path.df$lineid = paste0(run.df$donum[rows],":",run.df$line[rows])
+
   path.df = adapt_data_path_for_mod_regs(path.df, run.df)
 
   #plot.path.df(path.df)
@@ -627,7 +633,7 @@ stata.data.cmd.types = function() {
 }
 
 stata.data.cmd.types.vec = function() {
-  return(c(u='load', us='load',use = 'load', insheet = 'load', infix = 'load', import = 'load', sysuse = 'load', merge = 'mod', append='mod', preserve = 'preserve', restore = 'restore', g = 'mod', ge = 'mod', gen = 'mod', generate = 'mod', replace = 'mod', egen="mod", drop = 'mod', keep = 'mod', rename = 'mod', xtset="mod",tsset="mod", xtile="mod",pctile="mod", tabulate="mod", tabul="mod", tab="mod",ta="mod",encode="mod",predict="mod",xi="mod", collapse="mod", sort="mod",so="mod", tab1="mod"))
+  return(c(u='load', us='load',use = 'load', insheet = 'load', infix = 'load', import = 'load', sysuse = 'load', merge = 'mod', append='mod', preserve = 'preserve', restore = 'restore', g = 'mod', ge = 'mod', gen = 'mod', generate = 'mod', replace = 'mod', egen="mod", drop = 'mod', keep = 'mod', rename = 'mod', xtset="mod",tsset="mod", xtile="mod",pctile="mod", tabulate="mod", tabu="mod", tabul="mod", tab="mod",ta="mod",encode="mod",predict="mod",xi="mod", collapse="mod", sort="mod",so="mod", tab1="mod"))
 
   temp = stata.data.cmd.types()
   vec = NULL

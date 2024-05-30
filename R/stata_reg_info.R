@@ -212,6 +212,12 @@ expand.stata.var.patterns = function(pattern, cols, unlist=TRUE, uses_xi=FALSE) 
     # when translating to R.
     if (!is.null(pattern)) {
       pattern = stri_replace_all_fixed(pattern, "|","#")
+
+      # replace i.year*c.d => i.year##c.d
+      # but keep ye*r
+      #stri_detect_regex(pattern, "(([\\.][a-zA-Z0-9_]+))(\\*)")
+      pattern = stri_replace_all_regex(pattern, "(([\\.][a-zA-Z0-9_]+))(\\*)","$1##")
+
     }
   }
   # If there are interaction terms: split them up
