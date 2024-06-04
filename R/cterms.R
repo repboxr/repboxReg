@@ -304,7 +304,7 @@ create_cterm_col = function(dat, cterm, timevar=NA, panelvar=NA, tdelta=NA, chec
     dat = create_prefix_nolevel_cterm_col(dat, cterm,panelvar=panelvar, timevar=timevar, tdelta=tdelta)
     return(dat)
   } else if (!is_ia & has_level & has_prefix) {
-    note_problem("cterm_prefix_level", "Cannot yet generate columns for cterm ", cterm, " that contains a prefix and a factor level.")
+    note_problem("cterm_prefix_level", paste0("Cannot yet generate columns for cterm ", cterm, " that contains a prefix and a factor level."), stop=FALSE)
     dat[[cterm]] = NA
     return(dat)
   }
