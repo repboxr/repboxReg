@@ -54,12 +54,15 @@ make_regxvar = function(regvar,dat,  regcoef=NULL) {
   })
 
   regcoef = filter(regcoef, !is.na(coef))
+  # For some commands like mlogit we have duplicated entries
+  regcoef = regcoef[!duplicated(regcoef[,c("step","cterm")]), ]
 
   regxvar = tibble(artid=first(regvar$artid), step=first(regvar$step), ia_cterm=ia_cterms, cterm = res_li) %>%
     unnest(cterm) %>%
     left_join(regvar %>% select(ia_cterm, role), by="ia_cterm") %>%
     unique() %>%
-    mutate(in_regcoef = cterm %in% regcoef$cterm)
+    left_join(select(regcoef,step, cterm, org_coef=coef), by=c("cterm","step")) %>%
+    mutate(in_regcoef = !is.na(org_coef))
 
   regxvar
 

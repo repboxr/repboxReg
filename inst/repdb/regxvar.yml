@@ -33,3 +33,7 @@ fields:
   in_regcoef:
     descr: Does the cterm have a non-na coefficient in the base run regcoef?
     type: bool
+
+  org_coef:
+    descr: The coefficient in the base run in_regcoef
+    type: num
