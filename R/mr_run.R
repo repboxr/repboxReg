@@ -46,6 +46,9 @@ mr_cat = function(..., just.log=FALSE) {
 mr_run = function(mr, asteps = mr_get_asteps(mr), run_stata=TRUE, clear_old_step_results = TRUE, do_agg = !is.null(mr$study_agg_fun), stop.on.error = mr$opts$stop.on.error) {
   restore.point("mr_run")
   repbox_reset_problem_log("run")
+  repbox_set_problem_options(project_dir=mr$project_dir, fail_action=mr$opts$repbox_problem_fail_action, metaid = mr$metaid)
+  repbox_set_current_project_dir(mr$project_dir)
+
 
   mr$check_df = tibble(step = asteps, did_run=NA, problem="", deviation=NA,tolerable_deviation=NA, comment="")
 
@@ -210,6 +213,7 @@ mr_run_for_source_step = function(mr, source_step, path.df) {
       mr$check_df$did_run[check_row] = TRUE
 
       set_repbox_problem_step(cur.step)
+      repbox_problem_set_step(cur.step)
       if (mr$opts$stop.on.error) {
         mr = mr_analysis_step(mr, cur.step,dat)
       } else {
@@ -225,6 +229,8 @@ mr_run_for_source_step = function(mr, source_step, path.df) {
         }
       }
       clear_repbox_problem_step()
+      repbox_problem_set_step(NA_integer_)
+
 
       mr$step.df$runtime[cur.step] = as.numeric(Sys.time())-step.start
 

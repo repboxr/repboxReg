@@ -140,7 +140,7 @@ mr_init_study = function(project_dir,  metaid=NULL,artid = basename(project_dir)
 #' @param extra.infeasible An alternative to extra.cache. If the R code in a modification step throws an error just generate a flag by storing a file in metareg/extra_infeasible. No cache will be generated. Yet, when running the whole project again, DAP will mark any extra infeasible step as infeasible and thus generate cache files. This approach will sometimes generate more efficient caches than extra.cache = TRUE, but takes longer since the complete repbox project must be run again. Best set either extra.cache=TRUE or extra.infeasible=TRUE.
 
 
-mr_opts = function(save.each.step = TRUE,extra.cache=TRUE,load.extra.cache=TRUE, extra.infeasible=FALSE, stop.on.error=FALSE, pass.repdb.info=TRUE, pass.internal.info = FALSE, repdb.tabs = c("reg","regvar","regxvar","regcoef","regcheck", "cmdpart","colstat_dummy","colstat_factor","colstat_numeric"), save.header=TRUE, stata.preserve.always=TRUE, create.regxvar.cols=pass.repdb.info,  ...) {
+mr_opts = function(save.each.step = TRUE,extra.cache=TRUE,load.extra.cache=TRUE, extra.infeasible=FALSE, stop.on.error=FALSE, pass.repdb.info=TRUE, pass.internal.info = FALSE, repdb.tabs = c("reg","regvar","regxvar","regcoef","regcheck", "cmdpart","colstat_dummy","colstat_factor","colstat_numeric"), save.header=TRUE, stata.preserve.always=TRUE, create.regxvar.cols=pass.repdb.info, repbox_problem_fail_action = "msg",  ...) {
   list(
     save.each.step = save.each.step,
     extra.cache = extra.cache,
@@ -153,6 +153,7 @@ mr_opts = function(save.each.step = TRUE,extra.cache=TRUE,load.extra.cache=TRUE,
     save.header = save.header,
     stata.preserve.always = stata.preserve.always,
     create.regxvar.cols=create.regxvar.cols,
+    repbox_problem_fail_action =  repbox_problem_fail_action,
     ...
   )
 }

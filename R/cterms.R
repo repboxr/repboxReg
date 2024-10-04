@@ -287,7 +287,10 @@ create_cterm_col = function(dat, cterm, timevar=NA, panelvar=NA, tdelta=NA, chec
     dat[[cterm]] = NA
     # lnalpha is just shown in nbreg output but not a variable in the data set
     if (!isTRUE(cterm=="lnalpha")) {
-      note_problem("missing_var",paste0("Column ", cterm, " does not exist in data set and thus I cannot generate the cterm ", cterm), stop=FALSE)
+      #note_problem("missing_var",paste0("Column ", cterm, " does not exist in data set and thus I cannot generate the cterm ", cterm), stop=FALSE)
+      msg = paste0("Column ", cterm, " does not exist in data set and thus I cannot generate the cterm ", cterm)
+      repbox_problem(type="regvar_no_match", msg=msg)
+
     }
     return(dat)
 
@@ -304,7 +307,8 @@ create_cterm_col = function(dat, cterm, timevar=NA, panelvar=NA, tdelta=NA, chec
     dat = create_prefix_nolevel_cterm_col(dat, cterm,panelvar=panelvar, timevar=timevar, tdelta=tdelta)
     return(dat)
   } else if (!is_ia & has_level & has_prefix) {
-    note_problem("cterm_prefix_level", paste0("Cannot yet generate columns for cterm ", cterm, " that contains a prefix and a factor level."), stop=FALSE)
+    #note_problem("cterm_prefix_level", paste0("Cannot yet generate columns for cterm ", cterm, " that contains a prefix and a factor level."), stop=FALSE)
+    repbox_problem(type = "cterm_prefix_level", msg=paste0("Cannot yet generate columns for cterm ", cterm, " that contains a prefix and a factor level."))
     dat[[cterm]] = NA
     return(dat)
   }
@@ -351,7 +355,9 @@ create_prefix_nolevel_cterm_col = function(dat,cterm, panelvar=NA, timevar=NA, t
   dat[[cterm]] = NA
 
   if (!has.col(dat, cterm)) {
-    note_problem("missing_var",paste0("Column ", basevar, " does not exist in data set and thus I cannot generate the cterm ", cterm))
+    msg = paste0("Column ", basevar, " does not exist in data set and thus I cannot generate the cterm ", cterm)
+    repbox_problem(type="missing_var",msg=msg, fail_action="msg")
+    #note_problem("missing_var",msg)
     return(dat)
   }
   if (prefix == "") {

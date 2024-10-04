@@ -13,7 +13,7 @@ make_cols_small_info = function(df, cols = colnames(df)) {
       }
       # need to add try since integer conversion sometimes fails
       # with error
-      if (isTRUE(try(all(v==as.integer(v),na.rm=TRUE), silent=TRUE))) return("integer")
+      if (isTRUE(try(all(v==suppressWarnings(as.integer(v)),na.rm=TRUE), silent=TRUE))) return("integer")
       return("numeric")
     }
     return(class(v))[1]

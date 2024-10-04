@@ -1,8 +1,14 @@
+# TO DO: Replace  note_problem with repbox_problem everywhere...
+
+
 # Functions to correctly handle errors and other problems when conduction
-# a metare study
+# a metareg study
+
 
 note_problem = function(problem_type, problem_descr, step = get_repbox_problem_step(), stop=TRUE) {
   restore.point("note_problem")
+  repbox_problem(msg=msg, type=type)
+  return()
   # TO DO: Retrieve problem context
   msg = paste0("Problem type: ", problem_type, "\n\n", problem_descr)
 
@@ -15,7 +21,7 @@ note_problem = function(problem_type, problem_descr, step = get_repbox_problem_s
     stop(msg)
   } else {
     cat(msg)
-    warning(msg)
+    #warning(msg)
   }
 }
 

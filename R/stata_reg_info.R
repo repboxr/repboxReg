@@ -266,7 +266,7 @@ expand.stata.var.patterns = function(pattern, cols, unlist=TRUE, uses_xi=FALSE) 
         pattern[row] =paste0(pattern.lhs[row] ,cols[mcols[1]])
       } else if (length(mcols)==0) {
         msg = paste0("\nThe regression variable ", pattern.rhs[row], " could not be matched with any variable in the data set.\n")
-        note_problem("regvar_no_match",msg)
+        repbox_problem(msg,"regvar_no_match")
         stop()
       } else {
         pattern[row] = paste0(pattern.lhs[row],cols[mcols[1]])
