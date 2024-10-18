@@ -16,7 +16,7 @@ make_cols_small_info = function(df, cols = colnames(df)) {
       if (isTRUE(try(all(v==suppressWarnings(as.integer(v)),na.rm=TRUE), silent=TRUE))) return("integer")
       return("numeric")
     }
-    return(class(v))[1]
+    return(class(v)[[1]])
   })
 
   tibble(col = cols, class=class, distinct_num = distinct_num)
