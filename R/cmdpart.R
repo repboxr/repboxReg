@@ -311,7 +311,7 @@ cmdparts_of_stata_reg = function(cmdlines) {
   }
 
   df = cp$df
-
+  cp$str
 
   # weight_str, in_str and if_str #################################
 
@@ -423,34 +423,57 @@ cmdparts_of_stata_reg = function(cmdlines) {
   # {{cmd}} {{varlist}} {{if_str}} {{weight_str}} {{in_str}}, robust   level#~br3~#
 
   # We now replace bracket placeholders again since option parsing deals on its own with brackets
+  restore.point("cmdpart_of_reg_opts")
+  #options(warn=2)
+  #disable.restore.points(!TRUE)
+  #undebug(replace.placeholders)
   cp$str = replace.placeholders(cp$str, ph.df)
-  cp$df$content = replace.placeholders(cp$df$content, ph.df)
+  cp$df$content = replace.ph.keep.lines(cp$df$content, ph.df)
 
 
   start = stri_locate_first_regex(cp$str,",")[,1]+1
   end = nchar(cp$str)
   str_rows = which(!is.na(start))
 
+  make_opts = FALSE
   if (length(str_rows) > 0) {
     start = start[str_rows]; end = end[str_rows]
     all_opt_str = substring(cp$str[str_rows],start)
     res = cmdpart_parse_stata_opt_str(all_opt_str)
-
+    lens = lapply(res$opt_str,length)
+    make_opts = (any(lens>0))
+  }
+  if (make_opts) {
     # Replace str
     opt_ph = sapply(res$opt_str, function(x) paste0("{{opt_str", seq_along(x),"}}", collapse=" "))
     cp$str[str_rows] = stringi::stri_sub_replace(cp$str[str_rows], from=start, to=end, replacement=opt_ph)
 
-    lens = lapply(res$opt_str,length)
-
-    opt_df = tibble(
+    if (FALSE) {
+      test_li = list(
         str_row = unlist(mapply(rep,x=str_rows, times=lens,SIMPLIFY = FALSE)),
         parent = "main",
         opt_str = unlist(res$opt_str),
         opt = unlist(res$opt),
         opt_arg = unlist(res$opt_arg)
+      )
+      sapply(test_li, length)
+    }
+
+    my_unlist = function(x, empty = character(0)) {
+      res = unlist(x)
+      if (is.null(res)) return(empty)
+      res
+    }
+
+    opt_df = tibble(
+        str_row = unlist(mapply(rep,x=str_rows, times=lens,SIMPLIFY = FALSE)),
+        parent = rep("main", length(str_row)),
+        opt_str = my_unlist(res$opt_str),
+        opt = my_unlist(res$opt),
+        opt_arg = my_unlist(res$opt_arg)
       ) %>%
       group_by(str_row) %>%
-      mutate(opt_num = 1:n()) %>%
+      mutate(opt_num = seq_len(n())) %>%
       ungroup()
 
     n_add = NROW(opt_df)*2 + sum(!is.na(opt_df$opt_arg))
@@ -564,9 +587,11 @@ cmdpart_parse_stata_opt_str = function(str) {
   all_opt_str = all_opt = all_opt_arg = vector("list",NROW(str))
 
 
-  i = 1
+  i = 221
   for (i in seq_along(str)) {
     s = str[i]
+    if (trimws(s)=="") next
+
     # 1. Find 1st level braces and replace with ph
     brace_pos = locate_1st_level_braces(s,open="(",close=")")
 
@@ -617,8 +642,13 @@ cmdpart_parse_stata_opt_str = function(str) {
 }
 
 locate_1st_level_braces = function(txt, open="(", close = ")") {
-  if (length(txt))
-  res = str.blocks.pos(txt, open, close)
+  #restore.point("locate_1st_level_braces")
+  if (length(txt)==0) return(NULL)
+  res = try(str.blocks.pos(txt, open, close), silent=TRUE)
+  if (is(res,"try-error")) {
+    cat("\nNon-matching braces in reg options:\n  ", txt)
+    return(NULL)
+  }
   res$outer[res$levels==1,,drop=FALSE]
 }
 
