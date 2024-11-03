@@ -18,14 +18,14 @@ keep.cols =function(dat, cols) {
   # Update: We now expand Stata column patterns like "x*"
   #         and also account for abbreviations
   ecols = expand.stata.var.patterns(cols, names(dat))
-  dat[,intersect(cols, names(dat))]
+  dat[,intersect(ecols, names(dat))]
 }
 
 remove.cols = function(dat, cols) {
   # Updated: We now expand Stata column patterns like "x*"
   #          and also account for abbreviations
   ecols = expand.stata.var.patterns(cols, names(dat))
-  dat[,setdiff(names(dat),cols)]
+  dat[,setdiff(names(dat),ecols)]
 }
 
 # i() will replace Stata's _n equivalent
