@@ -29,6 +29,7 @@ stata.to.r = function(code, merge.lines=FALSE, add.comment=FALSE) {
   res = repboxStata::repbox.do.table(s)
   tab = res$tab
   ph.df = res$ph.df
+  txt = remove_quietly_capture_from_cmdlines(txt, tab)
   tab$code = txt
 
   r.code = sapply(seq_len(NROW(tab)), function(i) {
@@ -37,6 +38,16 @@ stata.to.r = function(code, merge.lines=FALSE, add.comment=FALSE) {
   if (merge.lines) r.code = merge.lines(r.code)
   r.code
 }
+
+remove_quietly_capture_from_cmdlines = function(code, tab) {
+  rows = !is.na(tab$quietly) & !is.true(tab$quietly=="")
+  code[rows] = str.right.of(code[rows], tab$quietly[rows])
+
+  rows = !is.na(tab$capture) & !is.true(tab$capture=="")
+  code[rows] = str.right.of(code[rows], tab$capture[rows])
+  code
+}
+
 
 parse_eval = function(cmd, envir=parent.frame()) {
   if (is.null(cmd)) return(invisible(NULL))
@@ -56,6 +67,9 @@ stata.tab.to.r = function(code=tab$code, tab, just.chain=FALSE, add.comment=FALS
 
 stata2r.gen = function(code=tab$code, tab=NULL, just.chain=FALSE, add.comment=FALSE, from.replace=FALSE) {
   restore.point("stata2r.gen")
+  if (!is.empty(tab$quietly)) {
+    code = str.right.of(code, tab$quietly)
+  }
   str = code %>% str.right.of(":") %>% str.right.of(":") %>% trimws() %>%
     str.right.of(" ")
   ifcode = str.right.of(str, " if ", not.found = "") %>% trimws()

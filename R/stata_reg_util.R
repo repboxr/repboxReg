@@ -14,7 +14,7 @@ make.is.in.sample = function(reg, dat) {
 }
 
 keep.cols =function(dat, cols) {
-  restore.point("keep.cols")
+  #restore.point("keep.cols")
   # Update: We now expand Stata column patterns like "x*"
   #         and also account for abbreviations
   ecols = expand.stata.var.patterns(cols, names(dat))

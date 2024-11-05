@@ -16,6 +16,8 @@
 #
 # L2.x -> L2@x
 #
+#
+#
 # cterm will not contain info on whether the variable is used
 # as factor or not.
 stata_expr_to_cterm = function(stata_expr) {
@@ -43,6 +45,13 @@ stata_expr_to_cterm = function(stata_expr) {
 
   # remove i. in the beginning of a variable name
   cterm = gsub(".","@", cterm, fixed=TRUE)
+
+  # Update: Replace stuff like
+  #      1.disab#0.vid_late
+  # with disab=1#vid_late=0
+  cterm = stri_replace_all_regex(cterm, "(^|#)([0-9]+)@([a-zA-Z_][a-zA-Z_0-9]*)", "$1$3=$2")
+
+
   cterm
 }
 
