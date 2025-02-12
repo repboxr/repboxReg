@@ -16,7 +16,7 @@ mr_get_asteps = function(mr, just_used=TRUE) {
   if (!is.null(mr[["used_steps"]]) & just_used) {
     return(mr$used_steps)
   }
-  mr$step.df$step[mr$step.df$step_type=="a"]
+  mr$step.df$step[mr$step.df$step_type=="a" & is.true(mr$step.df$reg_ok)]
 }
 
 mr_init_log = function(mr) {

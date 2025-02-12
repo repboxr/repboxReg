@@ -27,6 +27,33 @@ example = function() {
 }
 
 
+# Not all regressions did successfully generate output
+# We will reduce the dap to only contain successful regressions
+# Otherwise the unsuccessful regressions will cause problems later
+# reasons for unsuccessful regressions could be missing data
+dap_add_reg_ok = function(project_dir, dap=NULL) {
+  dap.file = file.path(project_dir,"metareg/dap/stata/dap.Rds")
+  if (is.null(dap)) {
+    dap = readRDS(dap.file)
+  }
+
+  regtab.file = file.path(project_dir,"repbox/stata/regtab.Rds")
+  org_regs = readRDS.or.null(regtab.file)
+
+  org_regs = left_join(org_regs,select(dap$step.df, step, donum, line, counter), by=c("donum","line","counter"))
+
+  dap$step.df = dap$step.df %>%
+    mutate(
+      reg_ok = case_when(
+        step_type!="a" ~ NA,
+        step %in% org_regs$step ~ TRUE,
+        TRUE ~ FALSE
+      )
+    )
+  saveRDS(dap, dap.file)
+  invisible(dap)
+}
+
 
 get.project.dap = function(project_dir,make.if.missing=FALSE, add.run.df=FALSE) {
   restore.point("get.project.dap")
@@ -554,6 +581,9 @@ plot.dap = function(dap, step.df = dap$step.df, error.steps=NULL) {
 
   if (!"cache" %in% colnames(step.df)) {
     step.df$cache = FALSE
+  }
+  if ("reg_ok" %in% colnames(step.df)) {
+    error.steps = union(error.steps, step.df$step[is.true(!step.df$reg_ok)])
   }
 
   nodes = step.df %>%

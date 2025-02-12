@@ -44,6 +44,10 @@ mr_base_run_study = function(project_dir, run_stata=TRUE, astep = NULL, extra.ca
   }
 
   dap = get.project.dap(project_dir,make.if.missing = TRUE, add.run.df = TRUE)
+  if (!has.col(dap, "reg_ok")) {
+    dap = dap_add_reg_ok(project_dir, dap=dap)
+  }
+
   step.df = dap$step.df
   #plot.dap(dap)
 
@@ -119,6 +123,7 @@ mr_base_stata_agg_fun = function(mr, stata_check_df, ...) {
   regtab.file = file.path(mr$project_dir,"repbox/stata/regtab.Rds")
   org_regs = readRDS.or.null(regtab.file)
 
+  ct = NULL
   for (i in seq_len(NROW(org_regs))) {
     ct = org_regs$ct[[i]]
     ct = remove_non_standard_stata_coefs(ct)
@@ -404,22 +409,23 @@ mr_base_stata_code_fun = function(mr, step, stata_code, ...) {
   # Command for which margina effects are stored
   if (cmd %in% stata_cmds_with_margin()) {
     extra_code = paste0('
-margins, atmeans dydx(*) post
-parmest, saving("',mr$step.dir, "/reg_", step, "__sb_mem.dta",'")
-repbox_write_reg_scalars "',mr$step.dir, "/regscalar_", step, "__sb_mem.txt",'"
-repbox_write_reg_macros "',mr$step.dir, "/regmacro_", step, "__sb_mem.txt",'"
+capture noisily margins, atmeans dydx(*) post
+capture noisily parmest, saving("',mr$step.dir, "/reg_", step, "__sb_mem.dta",'")
+capture noisily repbox_write_reg_scalars "',mr$step.dir, "/regscalar_", step, "__sb_mem.txt",'"
+capture noisily repbox_write_reg_macros "',mr$step.dir, "/regmacro_", step, "__sb_mem.txt",'"
 ')
   } else if (cmd == "dprobit") {
-    extra_code = paste0('repbox_write_dprobit_coef_se "',mr$step.dir, "/dprobit_", step, ".csv\n")
+    extra_code = paste0('capture noisily repbox_write_dprobit_coef_se "',mr$step.dir, "/dprobit_", step, ".csv\n")
   } else if (cmd %in% stata_cmds_with_exp_coef()) {
     extra_code = paste0('capture noisily estout . using "', mr$step.dir,'/reg_', step, '__sb_exp.tsv", cells("b se t p ci_l ci_u") replace eform\n')
   }
 
   code = paste0(
-    stata_code,
-    '\n\nparmest, label saving("',outfile,'", replace)
-repbox_write_reg_scalars "', scalar_outfile,'"
-repbox_write_reg_macros "', macro_outfile,'"
+    "capture noisily ", stata_code,
+    '\n
+capture noisily parmest, label saving("',outfile,'", replace)
+capture noisily repbox_write_reg_scalars "', scalar_outfile,'"
+capture noisily repbox_write_reg_macros "', macro_outfile,'"
 ', extra_code, if_store_code
   )
   code

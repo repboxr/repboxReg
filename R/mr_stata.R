@@ -119,7 +119,7 @@ mr_make_all_stata_code = function(mr, stata_code_fun=mr$stata_code_fun, asteps =
   step.df$stata_code[rows] = ""
 
 
-  step = 4
+  step = 2
   # Analysis code
   acode = sapply(asteps, function(step) {
     if (mr$opts$pass.repdb.info) {

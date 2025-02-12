@@ -510,6 +510,7 @@ parse.stata.reg.vars = function(cmd, str) {
 
 parse.stata.reg.vars.iv = function(cmd, str, rows, has.method = FALSE) {
   if (length(rows)==0) return(NULL)
+  org_str = str
   restore.point("parse.reg.vars.iv")
   if (has.method) {
     method = str.left.of(str," ") %>% trimws()
@@ -535,9 +536,22 @@ parse.stata.reg.vars.iv = function(cmd, str, rows, has.method = FALSE) {
     # so that we can later expand that Stata pattern
     trimws_around("-")
 
+
   br.start = stringi::stri_locate_first_fixed(str, "(")[,1]
   br.end = stringi::stri_locate_first_fixed(str, ")")[,1]
   equal.pos = stringi::stri_locate_first_fixed(str, "=")[,1]
+
+  # Default would be
+  # ivreg y i2 (x1 = i1)
+  #
+  # But also this is valid syntax (running OLS)
+  # ivreg y x1, robust cluster(i2)
+  #
+  # We thus check if there is a comma left of the first bracket
+  comma_pos = stringi::stri_locate_first_fixed(str, ",")[,1]
+  if (isTRUE(comma_pos < br.start)) {
+    return(parse.stata.reg.vars.default(cmd,str = org_str,rows = rows))
+  }
 
   endo = substring(str,br.start+1, equal.pos-1) %>% trimws() %>% shorten.spaces() %>% trimws_around("-")
   endo_parts = strsplit(endo," ",fixed = TRUE)
@@ -545,7 +559,7 @@ parse.stata.reg.vars.iv = function(cmd, str, rows, has.method = FALSE) {
   instr = substring(str,equal.pos+1, br.end-1) %>% trimws() %>% shorten.spaces() %>% trimws_around("-")
   instr_parts = strsplit(instr," ",fixed = TRUE)
 
-  # Replace first ( with " " and then cut cout bracket
+  # Replace first ( with " " and then cut out bracket
   substring(str, br.start, br.end) = " "
   str = str.cutout(str, br.start+1, br.end)
 
