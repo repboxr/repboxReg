@@ -649,11 +649,11 @@ stata.data.cmd.types = function() {
     preserve = c("preserve"),
     restore = c("restore"),
     # Commands that modify data and can be translated to R
-    mod = c("g","ge","gen","generate","replace","drop","keep","rename","merge","egen","xtset","tsset", "xtile","pctile","append","tabulate","tabul","tabu", "tab","ta","encode","predict","xi", "collapse", "sort","so","tab1"),
+    mod = c("g","ge","gen","generate","replace","drop","keep","rename","merge","egen","xtset","tsset", "xtile","pctile","append","tabulate","tabul","tabu", "tab","ta","encode","predict","xi", "collapse", "sort","so","tab1", "winsor"),
     # Commands that modify data but cannot be translated to R
     # predict also needs cache because it may use
     # results from previous regression
-    need_cache = c("merge","xtile","pctile","append","tabulate","tabul","tabu", "tab","ta","encode","predict","xi","collapse","sort","so","tab1"),
+    need_cache = c("merge","xtile","pctile","append","tabulate","tabul","tabu", "tab","ta","encode","predict","xi","collapse","sort","so","tab1", "winsor"),
 
     # Commands that under certain conditions modify the data
     # tabulate creates variables if called with the gen option
@@ -663,7 +663,7 @@ stata.data.cmd.types = function() {
 }
 
 stata.data.cmd.types.vec = function() {
-  return(c(u='load', us='load',use = 'load', insheet = 'load', infix = 'load', import = 'load', sysuse = 'load', merge = 'mod', append='mod', preserve = 'preserve', restore = 'restore', g = 'mod', ge = 'mod', gen = 'mod', generate = 'mod', replace = 'mod', egen="mod", drop = 'mod', keep = 'mod', rename = 'mod', xtset="mod",tsset="mod", xtile="mod",pctile="mod", tabulate="mod", tabu="mod", tabul="mod", tab="mod",ta="mod",encode="mod",predict="mod",xi="mod", collapse="mod", sort="mod",so="mod", tab1="mod"))
+  return(c(u='load', us='load',use = 'load', insheet = 'load', infix = 'load', import = 'load', sysuse = 'load', merge = 'mod', append='mod', preserve = 'preserve', restore = 'restore', g = 'mod', ge = 'mod', gen = 'mod', generate = 'mod', replace = 'mod', egen="mod", drop = 'mod', keep = 'mod', rename = 'mod', xtset="mod",tsset="mod", xtile="mod",pctile="mod", tabulate="mod", tabu="mod", tabul="mod", tab="mod",ta="mod",encode="mod",predict="mod",xi="mod", collapse="mod", sort="mod",so="mod", tab1="mod", winsor="mod"))
 
   temp = stata.data.cmd.types()
   vec = NULL

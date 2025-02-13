@@ -614,12 +614,12 @@ add_stata_reg_opts = function(reg.info, pho=NULL) {
   #opts_str[1] = "jd asb xhb(sdg)"
   opts_str = reg.info$opts_str
 
-  # We have examples like absorb(var)r
+  # We have examples like absorb (var)r
   # we need to transform it to absorb(var) r
   # Note that (var) will be replaced by a placeholder
-  # and we have absorb#~br1~#r which becomes absorb#~br1~#r
+  # and we have absorb #~br1~#r which becomes absorb#~br1~# r
   opts_str = stri_replace_all_regex(opts_str,"~#(?=[a-zA-Z])","~# ")
-
+  opts_str = stri_replace_all_regex(opts_str,"[ \t]*#~br","#~br")
 
   if (all(is.na(opts_str))) {
     reg.info$opts.df = vector("list",NROW(reg.info))
