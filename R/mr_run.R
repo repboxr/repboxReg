@@ -371,9 +371,23 @@ mr_mod_step = function(mr, step, dat, env = new.env(parent = METAREG_STATA_ENV))
 
 mr_analysis_step = function(mr, astep, dat) {
   restore.point("mr_run_analysis_step")
+
+  res = try(mr_analysis_step_make_args(mr, astep, dat), silent=TRUE)
+
+  if (is(res, "try-error")) {
+    mr = try(mr$step_run_fun(mr=mr, step=astep,has_error=TRUE, err=res, dat=NULL, reg=NULL, org_dat=dat, infeasible_filter=NULL), silent = TRUE)
+  } else {
+    mr = mr$step_run_fun(mr=mr, step=astep, dat=res$dat, reg=res$reg,   org_dat=res$org_dat, infeasible_filter=res$infeasible_filter)
+  }
+
+  check_mr_class(mr,"step_run_fun")
+
+  mr
+}
+
+mr_analysis_step_make_args = function(mr, astep, dat) {
+  restore.point("mr_analysis_step_make_args")
   reg = mr_get_reg_info(mr, astep,dat)
-
-
   infeasible_filter=FALSE
   org_dat = dat
   dat = mr_adapt_data_for_reg(mr$project_dir, astep, reg, dat)
@@ -408,15 +422,8 @@ mr_analysis_step = function(mr, astep, dat) {
   if (mr$opts$pass.repdb.info & !isTRUE(mr$opts$pass.internal.info)) {
     reg = mr_get_reg(mr, step=astep)
   }
-  mr = mr$step_run_fun(mr=mr, step=astep, dat=dat, reg=reg,   org_dat=org_dat, infeasible_filter=infeasible_filter)
-  check_mr_class(mr,"step_run_fun")
-
-
-
-
-  mr
+  res = list(reg=reg, dat=dat, org_dat=org_dat, infeasible_filter=infeasible_filter)
 }
-
 
 mr_adapt_data_for_reg = function(project_dir,step, reg, dat, logical.to.dummy = TRUE, use.filter = TRUE) {
   restore.point("mr_adapt_data_for_reg")
@@ -436,7 +443,7 @@ mr_adapt_data_for_reg = function(project_dir,step, reg, dat, logical.to.dummy = 
   if (logical.to.dummy) {
     cols = which(sapply(dat, is.logical))
     for (col in cols) {
-      dat[[col]] = as.integer(dat[[col]])
+      dat[[col]] = as_integer(dat[[col]])
     }
 
   }
@@ -526,7 +533,7 @@ mr_create_stata_timeseries_var = function(dat,var, prefix,reg, sep=".") {
   }
 
 
-  prefix.num = ifelse(prefix.num=="", 1, as.integer(trimws(prefix.num)))
+  prefix.num = ifelse(prefix.num=="", 1, as_integer(trimws(prefix.num)))
 
   if (prefix.type == "L") {
     fun = collapse::flag
@@ -680,6 +687,8 @@ The tolerable deviation is a subjective assement of you, the metareg designer, t
 
 
   regcheck = mr$check_df
+
+
   regcheck = add_cols_if_not_exist(regcheck, artid=artid, variant=variant)
   if (!is.null(tolerable_deviation)) {
     regcheck$tolerable_deviation = rep(tolerable_deviation, length.out = NROW(regcheck))

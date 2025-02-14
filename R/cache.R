@@ -104,7 +104,7 @@ mr_get_cache_df = function(project_dir) {
   ) %>%
     mutate(
       base = basename(file),
-      step = str.between(base,"step_",".dta") %>% as.integer()
+      step = str.between(base,"step_",".dta") %>% as_integer()
     ) %>%
     select(step, everything())
 
@@ -198,7 +198,7 @@ mr_get_extra_infeasible_steps = function(project_dir=NULL, inf.dir = paste0(mr$p
   )
   base = basename(files)
   steps = str.between(base,"step_",".")
-  as.integer(steps)
+  as_integer(steps)
 }
 
 
@@ -210,6 +210,6 @@ mr_get_extra_cache_files = function(project_dir=NULL, cache.dir = paste0(project
     list.files(cache.dir, glob2rx("*.dta"),full.names = TRUE)
   )
   base = basename(files)
-  steps = str.between(base,"step_",".") %>% as.integer()
+  steps = str.between(base,"step_",".") %>% as_integer()
   tibble(step = steps, cache_file = files)
 }

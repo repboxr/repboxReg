@@ -56,7 +56,7 @@ mr_base_run_study = function(project_dir, run_stata=TRUE, astep = NULL, extra.ca
   mr = mr_init_study(project_dir,
     metaid="base", version=0,
     stata_code_fun=mr_base_stata_code_fun,
-    step_run_fun = mr_base_step_run_fun,
+    step_run_fun = mr_base_step_run_fun_outer,
     stata_agg_fun = mr_base_stata_agg_fun,
     study_agg_fun = mr_base_study_agg_fun,
     dap=dap,opts = opts,
@@ -67,6 +67,14 @@ mr_base_run_study = function(project_dir, run_stata=TRUE, astep = NULL, extra.ca
   }
 
   mr$create.repdb = create.repdb
+
+  # remove previous error steps
+  error_dir = file.path(mr$project_dir,"metareg","base","error_steps")
+  error.files =list.files(error_dir, glob2rx("error_*.txt"), full.names = TRUE)
+  if (length(error.files)>0) {
+    file.remove(error.files)
+  }
+
 
   if (is.null(astep)) {
     mr = mr_run(mr, run_stata = run_stata, clear_old_step_results = run_stata)
@@ -194,10 +202,12 @@ mr_base_study_agg_fun = function(mr, ...) {
   org_regs = stata_agg$org_regs
 
   # R results from metareg run
-  regs = mr_get_steps_result(mr, "reg", add_step=TRUE)
+  error_regs = mr_get_steps_result(mr, "reg_error", add_step=FALSE)
+
+  regs = mr_get_steps_result(mr, "reg", add_step=FALSE)
 
   #regs = mr_agg_df_rds(mr, "reg_*.Rds", file_col="file")
-  #regs$step = as.integer(str.between(regs$file, "_", "."))
+  #regs$step = as_integer(str.between(regs$file, "_", "."))
 
 
   # Create all regcoef
@@ -223,10 +233,15 @@ mr_base_study_agg_fun = function(mr, ...) {
   colstat_factor = bind_rows_with_parent_fields(regs, "colstat_factor", "step")
 
 
-
+  rows = match(error_regs$step, mr$check_df$step)
+  if (length(rows)>0) {
+    mr$check_df$did_run[rows]=FALSE
+    mr$check_df$problem[rows]="metareg_base_failed"
+  }
   regcheck = mr_get_regcheck_after_run(mr, variant="sb", add_stata_check=TRUE,tolerable_deviation = 1e-12)
   diff = diff_org_sum %>% filter(compare_what=="all")
-  regcheck = left_join_overwrite(regcheck, select(diff,step, deviation= max_deviation), by="step")
+  regcheck = left_join_overwrite(regcheck, select(diff,step, deviation= max_deviation), by="step",drop_in = "x")
+
 
   missing.org.reg.steps = setdiff(regcheck$step, org_regs$step)
   if (length(missing.org.reg.steps)>0) {
@@ -241,7 +256,7 @@ mr_base_study_agg_fun = function(mr, ...) {
     header = mr_get_header(mr),
     regcheck = regcheck,
     vi_df = vi_df,
-    regxvar = bind_rows(regs$regxvar),
+    regxvar = suppressWarnings(if (is.null(regs$regxvar)) NULL else bind_rows(regs$regxvar)),
     metaid = mr$metaid,
     version = mr$version,
     timestamp = Sys.time(),
@@ -251,6 +266,7 @@ mr_base_study_agg_fun = function(mr, ...) {
 
     org_regs = org_regs,
     regs = regs[setdiff(names(regs), c("ct","vi"))],
+    error_regs = error_regs,
     stata_scalars = stata_agg$stata_scalars,
     stata_macros = stata_agg$stata_macros,
 
@@ -279,9 +295,37 @@ mr_base_study_agg_fun = function(mr, ...) {
   mr
 }
 
+mr_base_step_run_fun_outer = function(mr,step, ..., has_error=FALSE, err=NULL) {
+  err_msg = ""
+  if (!has_error) {
+    err = try(mr_base_step_run_fun(mr=mr,step=step,...), silent=TRUE)
+    restore.point("mr_base_step_run_fun_outer1")
+    has_error = is(err, "try-error")
+    if (!has_error) {
+      mr = err
+    } else {
+      err_msg = as.character(err)
+      cat("\n",err_msg,"\n")
+    }
+  } else {
+    err_msg = as.character(err)
+  }
+  restore.point("mr_base_step_run_fun_outer2")
+  # There was likely a parsing error
+  if (has_error) {
+    outdir = file.path(mr$project_dir,"metareg","base","error_steps")
+    if (!dir.exists(outdir)) dir.create(outdir)
+    writeLines(err_msg, paste0(outdir, "error_", step, ".txt"))
+    cat(paste0("\n  Metareg base run for step = ", step, " cancelled due to an error.\n"))
+    mr = mr_set_step_result(mr, step, reg_error=list(step=step, err_msg = err_msg))
+
+  }
+  return(mr)
+}
 # In R we will perform a regression using fixest (lm might take too long)
 mr_base_step_run_fun =  function(mr,step, reg, dat, org_dat, infeasible_filter, ...) {
   restore.point("mr_base_step_run_fun")
+  # stop()
 
   project_dir = mr$project_dir
   # Extract cmdpart, opts_df and se_info
@@ -363,6 +407,7 @@ mr_base_step_run_fun =  function(mr,step, reg, dat, org_dat, infeasible_filter, 
   regxvar = make_regxvar(regvar, dat, regcoef)
   reg$regxvar = list(regxvar)
 
+  reg$step = step
   mr = mr_set_step_result(mr, step, reg=reg)
 
 

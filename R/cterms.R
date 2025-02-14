@@ -119,7 +119,7 @@ canonical.output.terms.stata.default = function(terms, ...) {
   #terms[rows] = substring(terms[rows], 3)
 
   # Factor variable (no string only integer before .)
-  rows = dot.rows = has.substr(terms,".") & !is.na(suppressWarnings(as.integer(substring(terms,1,1))))
+  rows = dot.rows = has.substr(terms,".") & !is.na(suppressWarnings(as_integer(substring(terms,1,1))))
   base = str.right.of(terms[rows], ".")
   level = str.left.of(terms[rows], ".")
 
@@ -131,7 +131,7 @@ canonical.output.terms.stata.default = function(terms, ...) {
 
   # Remove certain prefixes like o. or co.
 
-  rows = has.substr(terms,".") & !is.na(suppressWarnings(as.integer(substring(terms,1,1))))
+  rows = has.substr(terms,".") & !is.na(suppressWarnings(as_integer(substring(terms,1,1))))
 
   terms = remove.unused.stata.prefixes(terms)
   terms = adapt.stata.prefix.notation(terms)
@@ -296,9 +296,8 @@ create_cterm_col = function(dat, cterm, timevar=NA, panelvar=NA, tdelta=NA, chec
     dat[[cterm]] = NA
     # lnalpha is just shown in nbreg output but not a variable in the data set
     if (!isTRUE(cterm=="lnalpha")) {
-      #note_problem("missing_var",paste0("Column ", cterm, " does not exist in data set and thus I cannot generate the cterm ", cterm), stop=FALSE)
       msg = paste0("Column ", cterm, " does not exist in data set and thus I cannot generate the cterm ", cterm)
-      repbox_problem(type="regvar_no_match", msg=msg)
+      repbox_problem(type="regvar_no_match", msg=msg,fail_action = "error")
 
     }
     return(dat)
@@ -316,8 +315,7 @@ create_cterm_col = function(dat, cterm, timevar=NA, panelvar=NA, tdelta=NA, chec
     dat = create_prefix_nolevel_cterm_col(dat, cterm,panelvar=panelvar, timevar=timevar, tdelta=tdelta)
     return(dat)
   } else if (!is_ia & has_level & has_prefix) {
-    #note_problem("cterm_prefix_level", paste0("Cannot yet generate columns for cterm ", cterm, " that contains a prefix and a factor level."), stop=FALSE)
-    repbox_problem(type = "cterm_prefix_level", msg=paste0("Cannot yet generate columns for cterm ", cterm, " that contains a prefix and a factor level."))
+    repbox_problem(type = "parse_reg_formula", msg=paste0("Cannot yet generate columns for cterm ", cterm, " that contains a prefix and a factor level."), fail_action = "error")
     dat[[cterm]] = NA
     return(dat)
   }
@@ -365,8 +363,7 @@ create_prefix_nolevel_cterm_col = function(dat,cterm, panelvar=NA, timevar=NA, t
 
   if (!has.col(dat, cterm)) {
     msg = paste0("Column ", basevar, " does not exist in data set and thus I cannot generate the cterm ", cterm)
-    repbox_problem(type="missing_var",msg=msg, fail_action="msg")
-    #note_problem("missing_var",msg)
+    repbox_problem(type="missing_var",msg=msg, fail_action="msg", fail_action = "error")
     return(dat)
   }
   if (prefix == "") {
@@ -387,7 +384,7 @@ create_prefix_nolevel_cterm_col = function(dat,cterm, panelvar=NA, timevar=NA, t
 
 
   if (any(has.substr(prefix.num,"("))) {
-    note_problem("ts_prefix_(", "\nCannot yet deal with time series prefixes like L(0/2).")
+    repbox_problem(type="parse_reg_formula", "\nCannot yet deal with time series prefixes like L(0/2).", fail_action = "error")
     return(dat)
   }
 
@@ -400,7 +397,7 @@ create_prefix_nolevel_cterm_col = function(dat,cterm, panelvar=NA, timevar=NA, t
   }
 
 
-  prefix.num = ifelse(prefix.num=="", 1, as.integer(trimws(prefix.num)))
+  prefix.num = ifelse(prefix.num=="", 1, as_integer(trimws(prefix.num)))
 
   if (prefix.type == "L") {
     fun = collapse::flag
@@ -470,3 +467,87 @@ cterm_extract_level = function(cterm) {
   str.right.of(cterm, "=")
 }
 
+
+
+#
+# example = function() {
+#   # Test example 1: Create lag variables for x1 using L(0/2).x1
+#   # This generates columns L0.x1, L1.x1, and L2.x1
+#   dat1 <- data.frame(time = 1:10, x1 = 101:110)
+#   dat1 <- create_time_series_range(dat1, "L(0/2)", "x1", timevar = "time")
+#   cat("Test example 1 (lags):\n")
+#   print(head(dat1))
+#
+#   # Test example 2: Create lead variables for x1 using F(0/3).x1
+#   # This generates columns F0.x1, F1.x1, F2.x1, and F3.x1
+#   dat2 <- data.frame(time = 1:10, x1 = 101:110)
+#   dat2 <- create_time_series_range(dat2, "F(0/3)", "x1", timevar = "time")
+#   cat("\nTest example 2 (leads):\n")
+#   print(head(dat2))
+#
+#   # Test example 3: Create difference variables for x1 using D(1/2).x1
+#   # This generates columns D1.x1 and D2.x1
+#   dat3 <- data.frame(time = 1:10, x1 = 101:110)
+#   dat3 <- create_time_series_range(dat3, "D(1/2)", "x1", timevar = "time")
+#   cat("\nTest example 3 (differences):\n")
+#   print(head(dat3))
+#
+# }
+# # Helper function to check if a value is empty
+# #is_empty <- function(x) {
+# #  return(is.null(x) || length(x) == 0 || (is.character(x) && x == ""))
+# #}
+#
+# # Subfunction to handle time series range expressions like L(0/4).x1
+# create_time_series_range <- function(dat, prefix, basevar, panelvar = NA, timevar = NA, tdelta = 1) {
+#   # Expect prefix in the form "L(0/4)" (or F, D, S, etc)
+#   # Get the operator letter (e.g., "L")
+#   op <- toupper(substr(prefix, 1, 1))
+#
+#   # Extract the range string between the parentheses (e.g., "0/4")
+#   range_str <- sub("^[A-Za-z]\\(([^)]+)\\).*", "\\1", prefix)
+#
+#   # Split the range into start and end values
+#   parts <- strsplit(range_str, "/")[[1]]
+#   if (length(parts) != 2) stop("Invalid time series range format in prefix: ", prefix)
+#   start <- as_integer(trimws(parts[1]))
+#   end   <- as_integer(trimws(parts[2]))
+#
+#   if (is.na(tdelta)) tdelta <- 1
+#
+#   # Loop over the sequence and, for each value, create a new column
+#   for(n in seq(start, end)) {
+#     # Construct the new variable name, e.g., "L0.x1", "L1.x1", etc.
+#     new_cterm <- paste0(op, n, ".", basevar)
+#
+#     # Build the argument list (using timevar and panelvar if available)
+#     args <- list(x = dat[[basevar]])
+#     if (!is_empty(timevar))  args$t <- dat[[timevar]]
+#     if (!is_empty(panelvar)) args$g <- dat[[panelvar]]
+#
+#     # For lags and leads we use collapse::flag; for differences we use collapse::fdiff.
+#     # For leads (F) we use a negative shift.
+#     if (op == "L") {
+#       fun <- collapse::flag
+#       args$n <- n * tdelta
+#     } else if (op == "F") {
+#       fun <- collapse::flag
+#       args$n <- -n * tdelta
+#     } else if (op == "D") {
+#       fun <- collapse::fdiff
+#       args$diff <- n
+#     } else if (op == "S") {
+#       fun <- collapse::fdiff
+#       args$n <- n
+#     } else {
+#       stop("Operator ", op, " not supported in time series range expressions")
+#     }
+#     # Generate the new column by calling the appropriate function
+#     dat[[new_cterm]] <- do.call(fun, args)
+#   }
+#   return(dat)
+# }
+#
+#
+#
+#

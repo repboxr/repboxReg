@@ -26,7 +26,7 @@ repbox_col_class = function(v, distinct_num = n_distinct(v,na.rm = TRUE)) {
     }
     # need to add try since integer conversion sometimes fails
     # with error
-    if (isTRUE((try(all(v==suppressWarnings(as.integer(v)),na.rm=TRUE), silent=TRUE)))) return("integer")
+    if (isTRUE((try(all(v==suppressWarnings(as_integer(v)),na.rm=TRUE), silent=TRUE)))) return("integer")
     return("numeric")
   }
   atomic_class(v)

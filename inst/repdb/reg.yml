@@ -111,15 +111,18 @@ fields:
     descr: r-squared
     type: num
 
-  # adj_r2:
-  #   descr: r-squared
-  #   type: num
-  #
-  # df_r:
-  #   descr: Residual degrees of freedom
-  #   type: int
-  #
-  # F:
-  #   descr: F-statistic
-  #   type: num
+  error_in_r:
+    type: bool
+    descr: |
+      If true, we could not parse the Stata regression and reproduce in R
+      without an error. For example, Stata might use a rare, complex regression formula
+      like 'reg y L(0/4).x1' that we don't parse.
+
+      If true, you typcially won't be able to use the regression in a metareg study.
+      Even pure Stata metareg study can fail since it is not guaranteed that parcels needed
+      to rewrite Stata code like cmdpart are correctly generated.
+
+      Even if error_in_r does not mean that all coefficients and standard errors
+      will be identical to the original Stata run. To check that, better look
+      at the regcheck parcel.
 

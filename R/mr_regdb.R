@@ -171,7 +171,7 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   project = artid = .artid = basename(project_dir)
   parcels = list()
 
-  if (NROW(agg$regs)==0) {
+  if (NROW(agg$regs)==0 + NROW(agg$error_regs)) {
     cat("\nNo regression successfully analyzed and stored via base metareg.\n")
     return(invisible(parcels))
 
@@ -192,6 +192,7 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   reg_dat = agg$org_regs %>%
     mutate(
       artid = .artid,
+      step = step,
       variant = "sb",
       lang = "stata",
       script_type = "do",
@@ -223,9 +224,11 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
   dat$code_line_start = dat$orgline
   dat$code_line_end = NA_integer_
   dat$source_lang = dat$lang
-  dat$tdelta = as.integer(dat$tdelta)
+  dat$tdelta = as_integer(dat$tdelta)
 
   dat$base_variant = "sb"
+
+  dat$error_in_r = !(dat$step %in% agg$regs$step)
 
   repdb_check_data(dat,"reg")
 
@@ -292,7 +295,7 @@ base_to_repdb = function(mr = NULL, project_dir=mr$project_dir, agg=  readRDS(fi
       # See https://www.stata.com/manuals/u11.pdf#u11.4.4
       prefix.type = tolower(substring(prefix,1,1)),
       prefix.num = trimws(substring(prefix,2)),
-      prefix.num = ifelse(prefix.num=="", 1, as.integer(trimws(prefix.num))),
+      prefix.num = ifelse(prefix.num=="", 1, as_integer(trimws(prefix.num))),
       transform = case_when(
         TRUE  ~ prefix.type
       ),

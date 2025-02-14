@@ -13,7 +13,7 @@ make_cols_small_info = function(df, cols = colnames(df)) {
       }
       # need to add try since integer conversion sometimes fails
       # with error
-      if (isTRUE(try(all(v==suppressWarnings(as.integer(v)),na.rm=TRUE), silent=TRUE))) return("integer")
+      if (isTRUE(try(all(v==suppressWarnings(as_integer(v)),na.rm=TRUE), silent=TRUE))) return("integer")
       return("numeric")
     }
     return(class(v)[[1]])
@@ -42,7 +42,7 @@ make_cols_info = function(df, cols=colnames(df)) {
         if (length(setdiff(distinct_vals[[j]], 0:1))==0)
           return("dummy")
       }
-      if (isTRUE(all(v==as.integer(v),na.rm=TRUE))) return("integer")
+      if (isTRUE(all(v==as_integer(v),na.rm=TRUE))) return("integer")
       return("numeric")
     }
     return(class(v))[1]
@@ -192,7 +192,7 @@ colstat_factor = function(col,df, reg_df=df, val = df[[col]], reg_val = reg_df[[
 }
 
 # Make column statistics as mainly stored later in colstat_num and colstat_factor
-colstat_dummy = function(col,df, reg_df=df, val = as.integer(df[[col]]), reg_val = as.integer(reg_df[[col]])) {
+colstat_dummy = function(col,df, reg_df=df, val = as_integer(df[[col]]), reg_val = as_integer(reg_df[[col]])) {
   restore.point("colstat_numeric")
 
   v = reg_val

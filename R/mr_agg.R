@@ -62,7 +62,7 @@ mr_agg_df_rds = function(mr, glob="*.Rds", file_col = "result_file") {
     return(bind_rows(li))
   }
   res = bind_rows(li, .id=file_col)
-  res[[file_col]] = basename(files[ as.integer(res[[file_col]]) ])
+  res[[file_col]] = basename(files[ as_integer(res[[file_col]]) ])
   res
 }
 
@@ -101,7 +101,7 @@ mr_agg_stata_reg_scalars = function(mr, file_prefix="regscalar_") {
   li = lapply(files, function(file) {
     df = read_var_equal_val_file(file,as.numeric = TRUE)
     if (!is.null(df)) {
-      step = as.integer(str.between(file, file_prefix, "__"))
+      step = as_integer(str.between(file, file_prefix, "__"))
       variant = str.between(file, "__", ".txt")
       df$step = rep(step, NROW(step))
       df$variant = rep(variant, NROW(step))
@@ -122,7 +122,7 @@ mr_agg_stata_reg_macros = function(mr, file_prefix="regmacro_") {
   li = lapply(files, function(file) {
     df = read_var_equal_val_file(file,as.numeric = FALSE)
     if (!is.null(df)) {
-      step = as.integer(str.between(file, file_prefix, "__"))
+      step = as_integer(str.between(file, file_prefix, "__"))
       variant = str.between(file, "__", ".txt")
       df$step = rep(step, NROW(step))
       df$variant = rep(variant, NROW(step))
@@ -158,10 +158,10 @@ mr_agg_stata_parmest = function(mr, file_prefix="reg_", missing.step="stop") {
     if (!is.null(df)) {
       has.variant = has.substr(file,"__")
       if (has.variant) {
-        step = as.integer(str.between(file, file_prefix, "__"))
+        step = as_integer(str.between(file, file_prefix, "__"))
         variant = str.between(file, "__", ".dta")
       } else {
-        step = as.integer(str.between(file, file_prefix, ".dta"))
+        step = as_integer(str.between(file, file_prefix, ".dta"))
         variant = ""
       }
       df$step = rep(step, NROW(step))
@@ -196,7 +196,7 @@ mr_agg_add_dprobit_coef = function(mr, stata_ct) {
   df = lapply(files, function(file) {
     df = read.csv(file)
     if (!is.null(df)) {
-      step = as.integer(str.between(file, "dprobit_", ".csv"))
+      step = as_integer(str.between(file, "dprobit_", ".csv"))
       df$step = rep(step, NROW(step))
     }
     return(df)
@@ -222,7 +222,7 @@ mr_agg_estout_tsv = function(mr, file_prefix="reg_", colnames = c("var","coef","
   li = lapply(files, function(file) {
     df = read_estout_tsv(file, colnames)
     if (!is.null(df)) {
-      step = as.integer(str.between(file, file_prefix, "__"))
+      step = as_integer(str.between(file, file_prefix, "__"))
       variant = str.between(file, "__", ".tsv")
       df$step = rep(step, NROW(step))
       df$variant = rep(variant, NROW(step))

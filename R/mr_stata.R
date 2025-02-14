@@ -55,7 +55,7 @@ mr_run_all_stata_code = function(mr, nostop = FALSE) {
   file = first(do.files)
   stata_check_df = lapply(do.files, function(file) {
     base = basename(file)
-    step = str.between(base, "path_",".do") %>% as.integer()
+    step = str.between(base, "path_",".do") %>% as_integer()
     log_file = paste0(dirname(file),"/path_", step,".log")
     mr_check_stata_log_error(log_file, step=step)
   }) %>% bind_rows()
@@ -238,7 +238,7 @@ mr_check_stata_log_error = function(log_file, step=NA) {
   if (!has_err) {
     return(tibble(step=step, stata_ok=TRUE, stata_err_code=NA_integer_, stata_err_msg=""))
   }
-  err_code = str.between(str, "(",")") %>% as.integer()
+  err_code = str.between(str, "(",")") %>% as_integer()
   err_lines = which(txt==txt[1])
   if (length(err_lines)>1) {
     msg_lines = rev(intersect(err_lines[2]+(1:2),1:10))

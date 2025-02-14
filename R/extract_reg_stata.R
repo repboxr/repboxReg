@@ -14,11 +14,11 @@ extract.stata.regs = function(project_dir, run.df=NULL, dotab=NULL, save=TRUE) {
   files = list.files(res.dir,glob2rx(paste0("*.dta")),full.names = TRUE)
 
   bfiles = basename(files)
-  donum = str.left.of(bfiles, "_") %>% as.integer()
+  donum = str.left.of(bfiles, "_") %>% as_integer()
   str = str.right.of(bfiles,"_")
-  line = str.left.of(str, "_") %>% as.integer()
+  line = str.left.of(str, "_") %>% as_integer()
   str = str.right.of(str,"_")
-  counter = str.remove.ends(str, right=4) %>% as.integer()
+  counter = str.remove.ends(str, right=4) %>% as_integer()
 
   regtab = tibble(regresfile=files,donum=donum,line=line,counter=counter) %>%
     arrange(donum, line, counter) %>%
@@ -133,11 +133,11 @@ extract.stata.regs.old = function(project_dir, run.df=NULL, dotab=NULL, save=TRU
   files = list.files(tsv.dir,glob2rx(paste0("*.tsv")),full.names = TRUE)
 
   bfiles = basename(files)
-  donum = str.left.of(bfiles, "_") %>% as.integer()
+  donum = str.left.of(bfiles, "_") %>% as_integer()
   str = str.right.of(bfiles,"_")
-  line = str.left.of(str, "_") %>% as.integer()
+  line = str.left.of(str, "_") %>% as_integer()
   str = str.right.of(str,"_")
-  counter = str.remove.ends(str, right=4) %>% as.integer()
+  counter = str.remove.ends(str, right=4) %>% as_integer()
 
   regtab = tibble(tsvfile=files,donum=donum,line=line,counter=counter) %>%
     arrange(donum, line, counter) %>%

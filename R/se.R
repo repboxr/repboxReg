@@ -10,7 +10,7 @@ se_stata_to_repdb = function(cmd, opts_df = cmdpart_to_opts_df(cmdpart), cmdpart
 
   if (cmd == "newey") {
     row = opts_df$opt == "lag"
-    lag = as.integer(opts_df$opt_arg[row])
+    lag = as_integer(opts_df$opt_arg[row])
     se = tibble(
       se_category = "robust",
       se_type = "nw",

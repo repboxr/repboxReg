@@ -46,7 +46,7 @@ stata.reg.se.info = function(reg) {
   if (reg$cmd == "newey") {
     restore.point("stata.reg.se.info.newey")
     row = opts.df$opt == "lag"
-    lag = as.integer(opts.df$opt_args[row])
+    lag = as_integer(opts.df$opt_args[row])
 
 
     se.info = tibble(
