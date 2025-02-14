@@ -69,11 +69,11 @@ mr_base_run_study = function(project_dir, run_stata=TRUE, astep = NULL, extra.ca
   mr$create.repdb = create.repdb
 
   # remove previous error steps
-  error_dir = file.path(mr$project_dir,"metareg","base","error_steps")
-  error.files =list.files(error_dir, glob2rx("error_*.txt"), full.names = TRUE)
-  if (length(error.files)>0) {
-    file.remove(error.files)
-  }
+  # error_dir = file.path(mr$project_dir,"metareg","base","error_steps")
+  # error.files =list.files(error_dir, glob2rx("error_*.txt"), full.names = TRUE)
+  # if (length(error.files)>0) {
+  #   file.remove(error.files)
+  # }
 
 
   if (is.null(astep)) {
@@ -233,10 +233,12 @@ mr_base_study_agg_fun = function(mr, ...) {
   colstat_factor = bind_rows_with_parent_fields(regs, "colstat_factor", "step")
 
 
-  rows = match(error_regs$step, mr$check_df$step)
-  if (length(rows)>0) {
-    mr$check_df$did_run[rows]=FALSE
-    mr$check_df$problem[rows]="metareg_base_failed"
+  if (NROW(error_regs)>0) {
+    rows = match(error_regs$step, mr$check_df$step)
+    if (length(rows)>0) {
+      mr$check_df$did_run[rows]=FALSE
+      mr$check_df$problem[rows]="analysis in R failed"
+    }
   }
   regcheck = mr_get_regcheck_after_run(mr, variant="sb", add_stata_check=TRUE,tolerable_deviation = 1e-12)
   diff = diff_org_sum %>% filter(compare_what=="all")
@@ -313,10 +315,10 @@ mr_base_step_run_fun_outer = function(mr,step, ..., has_error=FALSE, err=NULL) {
   restore.point("mr_base_step_run_fun_outer2")
   # There was likely a parsing error
   if (has_error) {
-    outdir = file.path(mr$project_dir,"metareg","base","error_steps")
-    if (!dir.exists(outdir)) dir.create(outdir)
-    writeLines(err_msg, paste0(outdir, "error_", step, ".txt"))
-    cat(paste0("\n  Metareg base run for step = ", step, " cancelled due to an error.\n"))
+    # outdir = file.path(mr$project_dir,"metareg","base","error_steps")
+    # if (!dir.exists(outdir)) dir.create(outdir)
+    # writeLines(err_msg, paste0(outdir, "error_", step, ".txt"))
+    cat(paste0("\n  R analysis of regression in step = ", step, " cancelled due to an error.\n"))
     mr = mr_set_step_result(mr, step, reg_error=list(step=step, err_msg = err_msg))
 
   }
