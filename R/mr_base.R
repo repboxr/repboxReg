@@ -453,7 +453,7 @@ mr_base_stata_code_fun = function(mr, step, stata_code, ...) {
   macro_outfile = paste0(mr$step.dir, "/regmacro_", step, "__sb.txt")
 
   cmd = mr$step.df$cmd[step]
-  # Command for which margina effects are stored
+  # Command for which marginal effects are stored
   if (cmd %in% stata_cmds_with_margin()) {
     extra_code = paste0('
 capture noisily margins, atmeans dydx(*) post
